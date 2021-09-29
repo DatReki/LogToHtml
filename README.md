@@ -1,5 +1,12 @@
 # Log2Html
 
+<a href="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml">
+    <img src="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml/badge.svg" />
+</a>
+<a href="https://www.nuget.org/packages/LogToHtml/">
+    <img src="https://img.shields.io/nuget/v/LogToHtml?style=flat-square" />
+</a>
+
 A small library to write (error) logs to a .html file.
 The html file's structure is based of an embedded .cshtml file.
 
