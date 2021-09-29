@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -8,11 +8,17 @@
 	<Description>A small library to write (error) logs to a .html file.</Description>
 	<PackageTags>HTML log logging</PackageTags>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<Version>1.0.2</Version>
+	<PackageReleaseNotes>Added a readme</PackageReleaseNotes>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Core\Create\Views\MainPage.cshtml" />
     <None Remove="Core\Create\Views\_Layout.cshtml" />
+	<None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>

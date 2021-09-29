@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LogToHtml" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\LogToHtml\LogToHtml\LogToHtml.csproj" />
   </ItemGroup>
 
