@@ -1,0 +1,44 @@
+﻿@{
+	Layout = "Views._Layout";
+}
+
+@section NavItems
+{
+	@foreach (string project in Model.Projects)
+	{
+		<li class="main-nav-items">
+			<a id="@project-header" class="main-nav-item-link" onclick="showDropdown(this.id, '@project-dropdown')">@project <i class="arrow left"></i></a>
+			<ul id="@project-dropdown" class="dropdown-menu">
+				@foreach (string logType in Model.LogTypes)
+				{
+					<li><a class="dropdown-nav-item" href="#" onclick="showErrorTable('@project-@logType-textBox')">@logType</a></li>
+				}
+			</ul>
+		</li>
+	}
+}
+
+@foreach (string project in Model.Projects)
+{
+	<div id="@project">
+		@foreach (string logType in Model.LogTypes)
+		{
+			<div id="@project-@logType-textBox" class="error-box @logType">
+				<h1>@logType</h1>
+				<table>
+					<tr>
+						<th>Date</th>
+						<th>Log</th>
+					</tr>
+					<tr>
+						@if (project == Model.Project && logType == Model.LogType.ToString())
+						{
+							<td>@Model.Date</td>
+							<td>@Model.Error</td>
+						}
+					</tr>
+				</table>
+			</div>
+		}
+	</div>
+}

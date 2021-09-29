@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Logging</title>
+	<style>
+		body {
+			margin: 0;
+			display: grid;
+			grid-template-columns: 15em auto;
+			grid-template-areas: "nav" "main";
+			z-index: 1;
+		}
+
+		/* Navigation */
+		.navbar {
+			position: fixed;
+			width: 15em;
+			height: 100vh;
+			background-color: #333;
+		}
+
+		.navbar ul {
+			list-style: none;
+		}
+
+		.navbar h1,
+		.navbar h3,
+		.navbar p {
+			font-family: Copperplate, "Copperplate Gothic Light", fantasy, Arial, Verdana, Helvetica, sans-serif;
+			color: white;
+		}
+
+		.navbar a {
+			color: #bdd4e7;
+		}
+
+		.navbar .nav-header {
+			font-size: 2rem;
+			font-weight: 700;
+			text-align: center;
+			padding: 0.25em;
+		}
+
+		.navbar .main-nav-items {
+			margin-bottom: 2em;
+		}
+
+		.navbar .main-nav-items .main-nav-item-link {
+			font-size: 1.5rem;
+			font-weight: 300;
+			margin-bottom: 0.5em;
+			color: white;
+			cursor: pointer;
+		}
+
+		.navbar .main-nav-items .main-nav-item-link i {
+			margin-left: 0.5em;
+		}
+
+		.navbar .main-nav-items a {
+			font-size: 1.2rem;
+			font-weight: 100;
+		}
+
+		.navbar .dropdown-menu {
+			display: none;
+		}
+		.navbar .dropdown-menu .dropdown-nav-item {
+			text-decoration: none;
+		}
+		.navbar .dropdown-menu .dropdown-nav-item:hover,
+		.navbar .dropdown-menu .dropdown-nav-item:focus {
+			color: deepskyblue;
+		}
+		/* Navigation */
+
+		/* Arrows */
+		.arrow {
+			border: solid white;
+			border-width: 0 3px 3px 0;
+			display: inline-block;
+			padding: 3px;
+		}
+
+		.right {
+			-webkit-transform: rotate(-45deg);
+			transform: rotate(-45deg);
+		}
+
+		.left {
+			-webkit-transform: rotate(135deg);
+			transform: rotate(135deg);
+		}
+
+		.up {
+			-webkit-transform: rotate(-135deg);
+			transform: rotate(-135deg);
+		}
+
+		.down {
+			-webkit-transform: rotate(45deg);
+			transform: rotate(45deg);
+		}
+		/* Arrows */
+
+		/* Main content */
+		.content {
+			padding: 1em;
+		}
+
+		.error-box {
+			display: none;
+			padding: 1%;
+			margin: 1em 0 1em 0;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			box-shadow: 5px 8px rgba(0, 0, 0, 0.5);
+		}
+
+		.error-box table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		.error-box tr th:nth-child(1),
+		.error-box tr td:nth-child(1) {
+			width: 30%;
+		}
+
+		.error-box td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+
+		.error-box tbody:nth-child(even) tr {
+			background-color: #dddddd;
+		}
+		/* Main content */
+	</style>
+</head>
+<body>
+	<!-- HTML -->
+	<header>
+		<nav class="navbar">
+			<div class="nav-header">
+				<h1>Logging</h1>
+			</div>
+			<ul>
+				@RenderSection("NavItems", false)
+			</ul>
+		</nav>
+	</header>
+	<main class="content">
+		@RenderBody()
+	</main>
+	<!-- JS -->
+	<script>
+		function showDropdown(callerId, id) {
+			var list = document.getElementById(id);
+			var header = document.getElementById(callerId).firstElementChild;
+
+			if (list.style.display == "none") {
+				list.style.display = "block";
+				header.className = "arrow down";
+			}
+			else {
+				list.style.display = "none";
+				header.className = "arrow left";
+			}
+		}
+
+		function showErrorTable(id) {
+			var classItems = document.getElementsByClassName("error-box");
+			for (var i = 0; i < classItems.length; i++) {
+				var item = classItems.item(i);
+				document.getElementById(item.id).style.display = "none";
+			}
+
+			var list = document.getElementById(id);
+			list.style.display = "block";
+		}
+	</script>
+</body>
+</html>
