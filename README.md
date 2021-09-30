@@ -66,6 +66,12 @@ public static Logging.Options options = new()
 ## Performance
 Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.
 
+## To Do
+- [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible. 
+- [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
+- [ ] Store the edited HTML as a string inside the library and edit this instead of reading the file first (if the HTML gets updated it will obviously still be written to the log file. However keeping the file as a variable will allow for faster access).
+- [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.
+
 ## Libraries
 
 Log2Html utilizes: 
