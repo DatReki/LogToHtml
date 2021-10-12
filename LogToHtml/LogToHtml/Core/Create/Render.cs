@@ -14,12 +14,11 @@ namespace LogToHtml.Core.Create
             .Build();
 
         /// <summary>Use RazorLight to get the embedded .cshtml file and convert it to a string</summary>
-        internal static async Task<string> RenderViewAsync(Options options, LogType logType, string error)
+        internal static async Task<string> RenderViewAsync(Options options)
 		{
             LogModel model = new()
             {
                 Projects = options.Projects,
-                Project = options.Project,
                 LogTypes = new List<string>()
                 {
                     LogType.Critical.ToString(),
@@ -27,9 +26,6 @@ namespace LogToHtml.Core.Create
                     LogType.Warn.ToString(),
                     LogType.Info.ToString()
                 },
-                LogType = logType,
-                Date = options.Date,
-                Error = error
             };
 
             return await _engine.CompileRenderAsync("Views.MainPage", model);

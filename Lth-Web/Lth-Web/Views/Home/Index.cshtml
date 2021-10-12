@@ -1,0 +1,97 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+	IEnumerable<string> result = null;
+	if (ViewData.ContainsKey("postedAccountForm"))
+	{
+		result = ViewData["postedAccountForm"] as IEnumerable<string>;
+	}
+}
+
+<div class="text-center">
+	<h1 class="display-4">Welcome</h1>
+	@if (result != null)
+	{
+		<form class="row g-3">
+			<div class="col-md-4">
+				<label for="firstname" class="form-label">First name</label>
+				<input type="text" class="form-control" id="firstname" name="firstname" value="@result.ElementAt(0)" disabled readonly>
+			</div>
+			<div class="col-md-4">
+				<label for="lastname" class="form-label">Last name</label>
+				<input type="text" class="form-control" id="lastname" name="lastname" value="@result.ElementAt(1)" disabled readonly>
+			</div>
+			<div class="col-md-4">
+				<label for="username" class="form-label">Username</label>
+				<div class="input-group has-validation">
+					<span class="input-group-text" id="inputGroupPrepend">
+						&#x00040;
+					</span>
+					<input type="text" class="form-control" id="username" name="username" value="@result.ElementAt(2)" aria-describedby="inputGroupPrepend" disabled readonly>
+				</div>
+			</div>
+			<div class="col-12 m-lg-2">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="@result.ElementAt(3)" id="invalidcheck" name="invalidcheck" disabled readonly>
+					<label class="form-check-label" for="invalidcheck">
+						Agree to terms and conditions
+					</label>
+				</div>
+			</div>
+			<div class="col-12">
+				<button class="btn btn-primary" type="submit" disabled>Submit form</button>
+			</div>
+		</form>
+		<hr />
+		<p>Time it took for logging: @result.ElementAt(4)</p>
+		<a asp-area="" asp-controller="Home" asp-action="Reset">Reset</a>
+	}
+	else
+	{
+		<form class="row g-3 needs-validation" method="POST" asp-area="" asp-controller="Home" asp-action="Login" novalidate>
+			<div class="col-md-4">
+				<label for="firstname" class="form-label">First name</label>
+				<input type="text" class="form-control" id="firstname" name="firstname" required>
+				<div class="valid-feedback"></div>
+				<div class="invalid-feedback">
+					Please provide your first name.
+				</div>
+			</div>
+			<div class="col-md-4">
+				<label for="lastname" class="form-label">Last name</label>
+				<input type="text" class="form-control" id="lastname" name="lastname" required>
+				<div class="valid-feedback"></div>
+				<div class="invalid-feedback">
+					Please provide your last name.
+				</div>
+			</div>
+			<div class="col-md-4">
+				<label for="username" class="form-label">Username</label>
+				<div class="input-group has-validation">
+					<span class="input-group-text" id="inputGroupPrepend">
+						&#x00040;
+					</span>
+					<input type="text" class="form-control" id="username" name="username" aria-describedby="inputGroupPrepend" required>
+					<div class="valid-feedback"></div>
+					<div class="invalid-feedback">
+						Please choose a username.
+					</div>
+				</div>
+			</div>
+			<div class="col-12 m-lg-2">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="" id="invalidcheck" name="invalidcheck" required>
+					<label class="form-check-label" for="invalidcheck">
+						Agree to terms and conditions
+					</label>
+					<div class="valid-feedback"></div>
+					<div class="invalid-feedback">
+						You must agree before submitting.
+					</div>
+				</div>
+			</div>
+			<div class="col-12">
+				<button class="btn btn-primary" type="submit">Submit form</button>
+			</div>
+		</form>
+	}
+</div>

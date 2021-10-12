@@ -10,7 +10,15 @@ namespace LogToHtml.Core.Edit
 		internal static string Edit(Options options, LogType logType, string error)
 		{
 			HtmlDocument document = new();
-			document.Load(options.FilePath);
+			if (string.IsNullOrEmpty(WriteLog.Html))
+			{
+				document.Load(options.FilePath);
+				WriteLog.Html = document.DocumentNode.OuterHtml;
+			}
+			else
+			{
+				document.LoadHtml(WriteLog.Html);
+			}
 			HtmlNode table = document.DocumentNode.SelectSingleNode($"//div[@id='{options.Project}-{logType}-textBox']/table");
 			table.AppendChild(HtmlNode.CreateNode($@"
 				<tr>

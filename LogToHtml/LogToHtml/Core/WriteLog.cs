@@ -7,14 +7,17 @@ namespace LogToHtml.Core
 	internal class WriteLog
 	{
 		internal static bool ReadFromFile = true;
+		internal static string Html = null;
 
 		/// <summary>Creates the .html file from an embedded .cshtml file. This will be used as our log file</summary>
 		internal static void CreateLog(Options options, LogType logType, string error)
 		{
-			string html = Create.Render.RenderViewAsync(options, logType, error).Result;
+			Html = Create.Render.RenderViewAsync(options).Result.FormatHtml();
+			string logHtml = Edit.EditExistingLog.Edit(options, logType, error).FormatHtml();
 			ReadFromFile = false;
 			AddToListOfLogs(options.Project, options.Date, logType, error);
-			html.FormatHtml().WriteToFile(options.FilePath);
+			Html = logHtml;
+			logHtml.WriteToFile(options.FilePath);
 		}
 
 		/// <summary>Edits the .html file containing all of our logs</summary>
@@ -31,7 +34,9 @@ namespace LogToHtml.Core
 			}
 
 			string html = Edit.EditExistingLog.Edit(options, logType, error);
-			html.FormatHtml().WriteToFile(options.FilePath);
+			string final = html.FormatHtml();
+			Html = final;
+			final.WriteToFile(options.FilePath);
 		}
 
 		/// <summary>Updates our lists containing all of the errors</summary>

@@ -11,6 +11,7 @@ namespace LogToHtml.Core.Read
 		{
 			HtmlDocument document = new();
 			document.Load(options.FilePath);
+			WriteLog.Html = document.DocumentNode.OuterHtml;
 			foreach (string project in options.Projects)
 			{
 				//Get Logs for project

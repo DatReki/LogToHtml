@@ -27,6 +27,30 @@ namespace Log2HtmlTester
 
 		static void Main(string[] args)
 		{
+			Stopwatch s = new();
+			s.Start();
+			Console.WriteLine($"{RunSpecific()} runs completed which took {s.Elapsed} time");
+			s.Restart();
+
+			var logs = Logging.GetLogs();
+			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warning.Count + logs.Error.Count + logs.Critical.Count}");
+			Console.WriteLine($"Getting logs took: {s.Elapsed}");
+			s.Reset();
+		}
+
+		private static int RunSpecific()
+		{
+			Array values = Enum.GetValues(typeof(Logging.LogType));
+			for (int i = 0; i < values.Length; i++)
+			{
+				Logging.Log(options, (Logging.LogType)values.GetValue(i), $"Log number: {i}");
+			}
+
+			return 10;
+		}
+
+		private static int RunRandomByAmount(int logAmount)
+		{
 			List<Testing> testing = new() { };
 			Random random = new();
 
@@ -42,19 +66,11 @@ namespace Log2HtmlTester
 				testing.Add(new Testing { TLogType = randomLogType, Error = error });
 			}
 
-			Stopwatch s = new();
-			s.Start();
 			foreach (var item in testing)
 			{
 				Logging.Log(options, item.TLogType, item.Error);
 			}
-			Console.WriteLine($"{runs} runs completed which took {s.Elapsed} time");
-			s.Restart();
-			//Logging.Log(options, Logging.LogType.Warn, "Testing");
-			var logs = Logging.GetLogs();
-			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warning.Count + logs.Error.Count + logs.Critical.Count}");
-			Console.WriteLine($"Getting logs took: {s.Elapsed}");
-			s.Reset();
+			return logAmount;
 		}
 	}
 }
