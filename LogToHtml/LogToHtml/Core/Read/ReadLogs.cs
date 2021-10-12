@@ -25,19 +25,22 @@ namespace LogToHtml.Core.Read
 					HtmlNode logTypeDiv = projectDiv.SelectSingleNode($".//div[contains(@class, '{typeOfLog}')]");
 					HtmlNodeCollection logs = logTypeDiv.SelectNodes($".//td");
 					string date = null;
-					for (int i = 0; i < logs.Count; ++i)
+					if (logs != null)
 					{
-						var item = logs[i];
-						if (item.InnerText.Length > 0)
+						for (int i = 0; i < logs.Count; ++i)
 						{
-							if (i % 2 == 0)
+							var item = logs[i];
+							if (item.InnerText.Length > 0)
 							{
-								date = item.InnerText.Trim();
-							}
-							else
-							{
-								//Add the found log to our internal list of logs
-								WriteLog.AddToListOfLogs(project, DateTime.Parse(date), typeOfLog, item.InnerText.Trim());
+								if (i % 2 == 0)
+								{
+									date = item.InnerText.Trim();
+								}
+								else
+								{
+									//Add the found log to our internal list of logs
+									WriteLog.AddToListOfLogs(project, DateTime.Parse(date), typeOfLog, item.InnerText.Trim());
+								}
 							}
 						}
 					}

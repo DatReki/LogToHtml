@@ -29,7 +29,7 @@ namespace Log2HtmlTester
 		{
 			Stopwatch s = new();
 			s.Start();
-			Console.WriteLine($"{RunSpecific()} runs completed which took {s.Elapsed} time");
+			Console.WriteLine($"{RunRandomByAmount(100)} runs completed which took {s.Elapsed} time");
 			s.Restart();
 
 			var logs = Logging.GetLogs();
@@ -57,7 +57,7 @@ namespace Log2HtmlTester
 			Array values = Enum.GetValues(typeof(Logging.LogType));
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-			int runs = 150;
+			int runs = logAmount;
 
 			for (int i = 0; i < runs; i++)
 			{

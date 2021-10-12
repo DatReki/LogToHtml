@@ -25,6 +25,8 @@ namespace Lth_Web.Controllers
 			LogToConsole = true
 		};
 
+		public static Random random = new();
+
 		public IActionResult Index()
 		{
 			if (TempData["postedAccountForm"] != null)
@@ -65,6 +67,55 @@ namespace Lth_Web.Controllers
 		public IActionResult Reset()
 		{
 			return RedirectToAction("Index", "Home");
+		}
+
+		public IActionResult AddMultipleLogs()
+		{
+			if (TempData["postedLogs"] != null)
+			{
+				ViewData["postedLogs"] = TempData["postedLogs"];
+			}
+			return View();
+		}
+
+		public class GenerateLogsVariables
+		{
+			public Logging.LogType LogType { get; set; }
+			public string Error { get; set; }
+		}
+
+		[HttpPost]
+		public IActionResult GenerateLogs()
+		{
+			List<GenerateLogsVariables> logList = new() { };
+
+			Array values = Enum.GetValues(typeof(Logging.LogType));
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+			int runs = Int32.Parse(Request.Form["amount"].ToString());
+
+			for (int i = 0; i < runs; i++)
+			{
+				Logging.LogType randomLogType = (Logging.LogType)values.GetValue(random.Next(values.Length));
+				string error = new(Enumerable.Repeat(chars, 20).Select(s => s[random.Next(s.Length)]).ToArray());
+				logList.Add(new GenerateLogsVariables { LogType = randomLogType, Error = error });
+			}
+
+			List<string> data = new List<string>();
+
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			foreach (GenerateLogsVariables item in logList)
+			{
+				data.Add(item.Error);
+				Logging.Log(options, item.LogType, item.Error);
+			}
+			sw.Stop();
+			data.Add($"Logging took: {sw.Elapsed.TotalSeconds}");
+
+			TempData["postedLogs"] = data;
+
+			return RedirectToAction("AddMultipleLogs", "Home");
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

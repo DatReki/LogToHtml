@@ -1,0 +1,61 @@
+﻿@{
+	ViewData["Title"] = "Multiple Logs";
+	IEnumerable<string> result = null;
+	if (ViewData.ContainsKey("postedLogs"))
+	{
+		result = ViewData["postedLogs"] as IEnumerable<string>;
+	}
+}
+@section Css
+{
+	<style>
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+			width: 100%;
+		}
+
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+	</style>
+}
+
+<div class="text-center">
+	<form class="row g-3 needs-validation" method="POST" asp-area="" asp-controller="Home" asp-action="GenerateLogs" novalidate>
+		<div class="col-12">
+			<label for="amount" class="form-label">Amount</label>
+			<input type="number" class="form-control" id="amount" name="amount" placeholder="Fill in the amount of (randomly generated) logs you want to be written" max="1500" required>
+			<div class="valid-feedback"></div>
+			<div class="invalid-feedback">
+				Can max only write 1500 logs.
+			</div>
+			<br /><br />
+		</div>
+		<div class="col-12">
+			<button class="btn btn-primary" type="submit">Submit form</button>
+		</div>
+	</form>
+	@if (result != null)
+	{
+		<p>@result.Last()</p>
+		<table>
+			<tr>
+				<th>Logs</th>
+			</tr>
+			@for (int i = 0; i < (result.Count() - 1); i++)
+			{
+				<tr>
+					<td>@result.ElementAt(i)</td>
+				</tr>
+			}
+		</table>
+	}
+</div>

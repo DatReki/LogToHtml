@@ -6,6 +6,9 @@
 <a href="https://www.nuget.org/packages/LogToHtml/">
     <img src="https://img.shields.io/nuget/v/LogToHtml?style=flat-square" />
 </a>
+<a href="https://www.paypal.com/donate?hosted_button_id=WRETYRRSJ4T2L">
+    <img src="https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square">
+</a>
 
 A small library to write (error) logs to a .html file.
 The html file's structure is based of an embedded .cshtml file.
@@ -69,7 +72,7 @@ Currently if you're just writing a log every so often performance is fine but if
 ## To Do
 - [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible. 
 - [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
-- [ ] Store the edited HTML as a string inside the library and edit this instead of reading the file first (if the HTML gets updated it will obviously still be written to the log file. However keeping the file as a variable will allow for faster access).
+- [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
 - [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.
 
 ## Libraries
