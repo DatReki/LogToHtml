@@ -70,6 +70,7 @@ public static Logging.Options options = new()
 Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.
 
 ## To Do
+- [ ] Fix the `System.NullReferenceException` errors.
 - [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible. 
 - [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
 - [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
