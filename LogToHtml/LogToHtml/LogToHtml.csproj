@@ -10,15 +10,15 @@
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
-	<Version>1.0.2</Version>
-	<PackageReleaseNotes>Added a readme</PackageReleaseNotes>
+	<Version>1.0.3</Version>
+	<PackageReleaseNotes>Fixed an null reference error when reading logs from file</PackageReleaseNotes>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Core\Create\Views\MainPage.cshtml" />
     <None Remove="Core\Create\Views\_Layout.cshtml" />
-	<None Include="README.md" Pack="true" PackagePath="\"/>
+	<None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
