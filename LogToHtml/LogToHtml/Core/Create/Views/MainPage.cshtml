@@ -11,7 +11,7 @@
 			<ul id="@project-dropdown" class="dropdown-menu">
 				@foreach (string logType in Model.LogTypes)
 				{
-					<li><a class="dropdown-nav-item" href="#" onclick="showErrorTable('@project-@logType-textBox')">@logType</a></li>
+					<li><a class="dropdown-nav-item" onclick="showErrorTable('@project-@logType-textBox')">@logType</a></li>
 				}
 			</ul>
 		</li>

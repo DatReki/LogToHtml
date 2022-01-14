@@ -10,8 +10,8 @@
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
-	<Version>1.0.3</Version>
-	<PackageReleaseNotes>Fixed an null reference error when reading logs from file</PackageReleaseNotes>
+	<Version>1.0.4</Version>
+	<PackageReleaseNotes>Removed some "href" attributes on "dropdown-nav-item" items so that the log file can be embedded within another page without causing issues.</PackageReleaseNotes>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
