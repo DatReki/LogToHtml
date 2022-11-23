@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogToHtml", "LogToHtml\LogToHtml\LogToHtml.csproj", "{9406D4EA-344E-48D3-A01A-B9EECC8A8586}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogToHtml", "LogToHtml\LogToHtml.csproj", "{9406D4EA-344E-48D3-A01A-B9EECC8A8586}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lth-Console", "Lth-Console\Lth-Console\Lth-Console.csproj", "{C4D62B32-217A-43A4-933B-998F8F8F6FA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lth-Console", "Lth-Console\Lth-Console.csproj", "{C4D62B32-217A-43A4-933B-998F8F8F6FA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lth-Web", "Lth-Web\Lth-Web\Lth-Web.csproj", "{9A08915E-BDED-4BE4-9918-919F7BF33917}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lth-Web", "Lth-Web\Lth-Web.csproj", "{9A08915E-BDED-4BE4-9918-919F7BF33917}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

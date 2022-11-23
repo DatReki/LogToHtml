@@ -2,7 +2,7 @@
 using static LogToHtml.Logging;
 using System.Collections.Generic;
 
-namespace LogToHtml.Core.Create
+namespace LogToHtml.Models
 {
     public class LogModel
     {

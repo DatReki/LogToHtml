@@ -12,7 +12,11 @@ namespace LogToHtml.Core
         private static readonly ReaderWriterLockSlim _readWriteLock = new();
         private static StreamWriter _sw;
 
-        /// <summary>Write contents to file</summary>
+        /// <summary>
+        /// Write HTML string to file.
+        /// </summary>
+        /// <param name="content">HTML.</param>
+        /// <param name="path">Location of the log file.</param>
         internal static void WriteToFile(this string content, string path)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -33,7 +37,9 @@ namespace LogToHtml.Core
             }
         }
 
-        /// <summary>Use AngleSharp & Regex to format our HTML</summary>
+        /// <summary>
+        /// Use AngleSharp & Regex to format our HTML.
+        /// </summary>
         internal static string FormatHtml(this string html)
         {
             string result = null;
@@ -47,11 +53,12 @@ namespace LogToHtml.Core
                     Indentation = "\t",
                     NewLine = "\n"
                 });
+
                 //Remove empty new lines from the HTML.
                 //Not sure what causes it but by default file with have a lot of random newlines
                 result = Regex.Replace(writer.ToString(), @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline);
             }
             return result;
         }
-	}
+    }
 }
