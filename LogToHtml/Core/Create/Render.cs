@@ -17,18 +17,17 @@ namespace LogToHtml.Core.Create
         /// <summary>
         /// Use RazorLight to get the embedded .cshtml file and convert it to a string.
         /// </summary>
-        /// <param name="options">Options for the log entry</param>
-        internal static async Task<string> RenderViewAsync(Options options)
+        internal static async Task<string> RenderViewAsync()
         {
             LogModel model = new()
             {
-                Projects = options.Projects,
+                Projects = Configuration.Projects,
                 LogTypes = new List<string>()
                 {
-                    LogType.Critical.ToString(),
-                    LogType.Error.ToString(),
-                    LogType.Warn.ToString(),
-                    LogType.Info.ToString()
+                    LogLevel.Critical.ToString(),
+                    LogLevel.Error.ToString(),
+                    LogLevel.Warn.ToString(),
+                    LogLevel.Info.ToString()
                 },
             };
 

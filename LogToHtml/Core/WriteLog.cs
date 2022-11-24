@@ -8,7 +8,7 @@ namespace LogToHtml.Core
     internal class WriteLog
     {
         internal static bool ReadLogFile = true;
-        internal static string Html = null;
+        internal static string Html = string.Empty;
 
         /// <summary>
         /// Creates the .html file from an embedded .cshtml file. This will be used as our log file.
@@ -16,20 +16,20 @@ namespace LogToHtml.Core
         /// <param name="options">Options for the log entry.</param>
         /// <param name="logType">The logs LogType.</param>
         /// <param name="message">The message associated with the log.</param>
-        internal static void CreateLog(Options options, LogType logType, string message)
+        internal static void CreateLog(Options options, LogLevel logType, string message)
         {
             // Create & format a HTML file from the embedded .cshtml file
-            Html = Create.Render.RenderViewAsync(options).Result.FormatHtml();
+            Html = Create.Render.RenderViewAsync().Result.FormatHtml();
             // Add first log entry to the log file
             string logHtml = Edit.EditExistingLog.Edit(options, logType, message).FormatHtml();
             // Indicate we don't need to read from the log file as we just created a new one
             ReadLogFile = false;
             // Add log to list of all logs
-            AddToListOfLogs(options.Project, options.Date, logType, message);
+            AddToListOfLogs(options.Project, Configuration.Date, logType, message);
             // Update static HTML string
             Html = logHtml;
             // Add new entry to log file
-            logHtml.WriteToFile(options.FilePath);
+            logHtml.WriteToFile();
         }
 
         /// <summary>
@@ -38,15 +38,15 @@ namespace LogToHtml.Core
         /// <param name="options">Options for the log entry.</param>
         /// <param name="logType">The logs LogType.</param>
         /// <param name="message">The message associated with the log.</param>
-        internal static void EditLog(Options options, LogType logType, string message)
+        internal static void EditLog(Options options, LogLevel logType, string message)
         {
             if (ReadLogFile)
             {
-                Read.ReadLogs.ReadLogsFromFile(options);
+                Read.ReadLogs.ReadLogsFromFile();
                 ReadLogFile = false;
             }
             else
-                AddToListOfLogs(options.Project, options.Date, logType, message);
+                AddToListOfLogs(options.Project, Configuration.Date, logType, message);
 
             // Add log to HTML string
             string html = Edit.EditExistingLog.Edit(options, logType, message);
@@ -55,7 +55,7 @@ namespace LogToHtml.Core
             // Update static HTML string
             Html = html;
             // Write updated HTML string to log file
-            html.WriteToFile(options.FilePath);
+            html.WriteToFile();
         }
 
         /// <summary>
@@ -65,20 +65,20 @@ namespace LogToHtml.Core
         /// <param name="date">Date the log was written.</param>
         /// <param name="logType">The logs LogType.</param>
         /// <param name="message">The message associated with the log.</param>
-        internal static void AddToListOfLogs(string project, DateTime date, LogType logType, string message)
+        internal static void AddToListOfLogs(string project, DateTime date, LogLevel logType, string message)
         {
             switch (logType)
             {
-                case LogType.Critical:
+                case LogLevel.Critical:
                     AllLogs.Critical.Add(new LogData() { Project = project, Date = date, Error = message });
                     break;
-                case LogType.Error:
+                case LogLevel.Error:
                     AllLogs.Error.Add(new LogData() { Project = project, Date = date, Error = message });
                     break;
-                case LogType.Warn:
+                case LogLevel.Warn:
                     AllLogs.Warn.Add(new LogData() { Project = project, Date = date, Error = message });
                     break;
-                case LogType.Info:
+                case LogLevel.Info:
                     AllLogs.Info.Add(new LogData() { Project = project, Date = date, Error = message });
                     break;
             }

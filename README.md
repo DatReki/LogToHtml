@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square">
 </a>
 
-A small library to write (error) logs to a .html file.
+A small library to write logs to a .html file.
 The html file's structure is based of an embedded .cshtml file.
 
 Currently tested working on Linux & Windows.
@@ -20,51 +20,99 @@ Currently tested working on Linux & Windows.
 ## Usage
 Write a log
 ```cs
-using Log2Html;
+using LogToHtml;
+using System.Reflection;
 
-class Program
+namespace Example
 {
-    public static Logging.Options options = new()
-    {
-        Projects = new List<string>()
-        {
-            $"{Assembly.GetCallingAssembly().GetName().Name}"
-        },
-        Project = $"{Assembly.GetCallingAssembly().GetName().Name}",
-        LogToConsole = true
-    };
+	internal class Program
+	{
+		#region Configure options for each individual log entry
+		public static Logging.Options Options = new()
+		{
+			// Name of the project that you're currently logging from.
+			// If you have a solution with multiple projects,
+			// you would change this value for each different project.
+			Project = $"{Assembly.GetCallingAssembly().GetName().Name}",
 
-    static void Main(string[] args)
-    {
-        Logging.Log(options, Logging.LogType.Warn, "Testing");
-    }
+			// Indicate if you just want to write to the HTML file or also output results on the console.
+			LogToConsole = true
+		};
+		#endregion
+
+		static void Main(string[] args)
+		{
+			#region Configure global options
+            // (these are applied across all projects in a solution)
+
+			// [Required]
+			// A List of projects that the logger is used for.
+			// If you only use the logger in a single project assign the same value here as you did in 'Options.Project'
+			List<string> projects = new()
+			{
+				$"{Assembly.GetCallingAssembly().GetName().Name}"
+			};
+
+			// [Optional]
+			// The path where the log file is located.
+			string logpath = Path.Combine(Environment.CurrentDirectory, "logs", "log.html");
+
+			// [Optional]
+			// Set the maximum size of a log file (example has a max size of 1 MB).
+			int maxSize = 1000000;
+
+			// [Optional]
+			// Set what timezone the library uses.
+			TimeZoneInfo timezone = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
+
+			// [Optional]
+			// Change what colors the library writes to the console based on LogLevel.
+			Configuration.Colors colors = new()
+			{
+				Info = "0, 255, 255",
+				Warn = "0,95,95",
+				Error = "#5f0000",
+				Critical = "#d75f00"
+			};
+
+			// [Optional]
+			// Change what get's written to the console.
+			Configuration.ConsoleConfig consoleConfig = new()
+			{
+				Date = true,
+				FileName = true,
+				LineNumber = false,
+				LogLevel = true,
+				MethodName = false,
+				ProjectName = true
+			};
+
+			// You only need to set this once in your entire solution.
+			_ = new Configuration(projects, logpath, maxSize, timezone, colors, consoleConfig);
+			#endregion
+
+			// And now you can start logging
+			Logging.Log(Options, Logging.LogLevel.Info, $"This is a test message");
+		}
+	}
 }
 ```
 
 Retrieve written logs
 ```cs
-//Returns lists with errors all of different log levels written
-var logs = Logging.GetLogs();
+using LogToHtml.Models;
+
+// Get all logs
+Logs allLogs = Logging.GetLogs();
+// Get all logs with the info LogLevel
+List<LogData> infoLogs = Logging.GetInfoLogs();
+// Get all logs with the warn LogLevel
+List<LogData> warnLogs = Logging.GetWarnLogs();
+// Get all logs with the error LogLevel
+List<LogData> errorLogs = Logging.GetErrorLogs();
+// Get all logs with the critical LogLevel
+List<LogData> criticalLogs = Logging.GetCriticalLogs();
 ```
-Options
-```cs
-public static Logging.Options options = new()
-{
-    Projects = new List<string>()
-    {
-        $"{Assembly.GetCallingAssembly().GetName().Name}"
-    },
-    Project = $"{Assembly.GetCallingAssembly().GetName().Name}",
-    Date = DateTime.UtcNow,
-    FilePath = Path.Combine(Environment.CurrentDirectory, "logging", "loggin.html"),
-    LogToConsole = true
-};
-```
-1. <strong>Projects</strong>: A list of projects within the solution (so you can write different logs for each project).
-2. <strong>Project</strong>: name of current project that is being used for logging (change this option for each solution obviously).
-3. <strong>Date</strong>: DateTime format you want to be used in the logs (default is `DateTime.UtcNow`).
-4. <strong>FilePath</strong>: The path you want the file to be written to and it's name.
-5. <strong>LogToConsole</strong>: Boolean indicating wether or not you want the library to also write to the console.
 
 ## Performance
 Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.
@@ -74,11 +122,3 @@ Currently if you're just writing a log every so often performance is fine but if
 - [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
 - [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
 - [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.
-
-## Libraries
-
-Log2Html utilizes: 
-1. <a href="https://github.com/toddams/RazorLight">RazorLight</a> to read embedded .cshtml and convert it to string
-2. <a href="https://html-agility-pack.net/">Html Agility Pack</a> to read and write to the .html file
-3. <a href="https://anglesharp.github.io/">ΛngleSharp</a> to format the HTML
-4. <a href="https://github.com/silkfire/Pastel">Pastel</a> to write colors to the console

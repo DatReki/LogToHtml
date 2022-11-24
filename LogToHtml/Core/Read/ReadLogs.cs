@@ -9,25 +9,24 @@ namespace LogToHtml.Core.Read
         /// <summary>
         /// Get all log entries from the .html file
         /// </summary>
-        /// <param name="options"></param>
-        internal static void ReadLogsFromFile(Options options)
+        internal static void ReadLogsFromFile()
         {
             HtmlDocument document = new();
-            document.Load(options.FilePath);
+            document.Load(Configuration.LogFile.Full);
             WriteLog.Html = document.DocumentNode.OuterHtml;
-            foreach (string project in options.Projects)
+            foreach (string project in Configuration.Projects)
             {
                 // Get Logs for project
                 HtmlNode projectDiv = document.DocumentNode.SelectSingleNode($"//div[@id='{project}']");
 
                 // Get logs for each logType
-                foreach (LogType typeOfLog in (LogType[])Enum.GetValues(typeof(LogType)))
+                foreach (LogLevel typeOfLog in (LogLevel[])Enum.GetValues(typeof(LogLevel)))
                 {
                     // The "." at the start of the node selector is necessary to make it understand that it's an child elemment
                     // In the below case logTypeDiv is selecting from the children of projectDiv
                     HtmlNode logTypeDiv = projectDiv.SelectSingleNode($".//div[contains(@class, '{typeOfLog}')]");
                     HtmlNodeCollection logs = logTypeDiv.SelectNodes($".//td");
-                    string date = null;
+                    string date = string.Empty;
                     if (logs != null)
                     {
                         for (int i = 0; i < logs.Count; ++i)

@@ -1,16 +1,8 @@
-﻿# Log2Html
-A small library to write logs to a .html file.
-The html file's structure is based of an embedded .cshtml file.
-
-Currently tested working on Linux & Windows.
-
-## Usage
-Write a log
-```cs
-using LogToHtml;
+﻿using LogToHtml;
+using LogToHtml.Models;
 using System.Reflection;
 
-namespace Example
+namespace Lth_Example
 {
 	internal class Program
 	{
@@ -29,9 +21,7 @@ namespace Example
 
 		static void Main(string[] args)
 		{
-			#region Configure global options
-            // (these are applied across all projects in a solution)
-
+			#region Configure global options (these are applied across all projects in a solution)
 			// [Required]
 			// A List of projects that the logger is used for.
 			// If you only use the logger in a single project assign the same value here as you did in 'Options.Project'
@@ -80,26 +70,19 @@ namespace Example
 
 			// And now you can start logging
 			Logging.Log(Options, Logging.LogLevel.Info, $"This is a test message");
+
+			#region Retrieve written logs
+			// Get all logs
+			Logs allLogs = Logging.GetLogs();
+			// Get all logs with the info LogLevel
+			List<LogData> infoLogs = Logging.GetInfoLogs();
+			// Get all logs with the warn LogLevel
+			List<LogData> warnLogs = Logging.GetWarnLogs();
+			// Get all logs with the error LogLevel
+			List<LogData> errorLogs = Logging.GetErrorLogs();
+			// Get all logs with the critical LogLevel
+			List<LogData> criticalLogs = Logging.GetCriticalLogs();
+			#endregion
 		}
 	}
 }
-```
-
-Retrieve written logs
-```cs
-using LogToHtml.Models;
-
-// Get all logs
-Logs allLogs = Logging.GetLogs();
-// Get all logs with the info LogLevel
-List<LogData> infoLogs = Logging.GetInfoLogs();
-// Get all logs with the warn LogLevel
-List<LogData> warnLogs = Logging.GetWarnLogs();
-// Get all logs with the error LogLevel
-List<LogData> errorLogs = Logging.GetErrorLogs();
-// Get all logs with the critical LogLevel
-List<LogData> criticalLogs = Logging.GetCriticalLogs();
-```
-
-## Performance
-Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.

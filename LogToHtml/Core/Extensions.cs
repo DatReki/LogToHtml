@@ -1,31 +1,103 @@
-﻿using System.IO;
-using System.Threading;
-using System.Text.RegularExpressions;
-
-using AngleSharp.Html;
+﻿using AngleSharp.Html;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace LogToHtml.Core
 {
     internal static class Extensions
     {
         private static readonly ReaderWriterLockSlim _readWriteLock = new();
-        private static StreamWriter _sw;
+        private static StreamWriter _sw = StreamWriter.Null;
 
         /// <summary>
-        /// Write HTML string to file.
+        /// Check if a directory exists or not
+        /// </summary>
+        /// <param name="path">Path to a file/directory</param>
+        /// <param name="directory">If true returns the directories name</param>
+        /// <returns></returns>
+        internal static bool TryGetDirectoryName(this string path, out string directory)
+        {
+            string? x = Path.GetDirectoryName(path);
+            if (x == null)
+            {
+                directory = string.Empty;
+                return false;
+            }
+            else
+            {
+                directory = x;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Add all numbers in a string that appear in a row to a integer list.
+        /// If other characters appear between numbers add the next set to a new index.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        internal static List<int> SplitNumbersInString(this string s)
+        {
+            s = s.Trim();
+            List<int> result = new();
+            try
+            {
+                List<int> numbers = new();
+
+                for (int count = 0; count < s.Length; count++)
+                {
+                    char c = s[count];
+                    if ((count + 1) == s.Length)
+                    {
+                        if (char.IsNumber(c))
+                            numbers.Add(int.Parse(c.ToString()));
+
+                        result.Add(int.Parse(numbers.IntToString()));
+                    }
+                    else if (char.IsNumber(c))
+                    {
+                        numbers.Add(int.Parse(c.ToString()));
+                    }
+                    else if (numbers.Count > 0)
+                    {
+                        result.Add(int.Parse(numbers.IntToString()));
+                        numbers.Clear();
+                    }
+                }
+            }
+            catch { }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert a list of integers to a string
+        /// </summary>
+        /// <param name="numbers"></param>
+        /// <returns></returns>
+        internal static string IntToString(this List<int> numbers)
+        {
+            StringBuilder y = new();
+            numbers.ForEach(x => y.Append(x));
+            return y.ToString();
+        }
+
+        /// <summary>
+        /// Write HTML string to log file.
         /// </summary>
         /// <param name="content">HTML.</param>
-        /// <param name="path">Location of the log file.</param>
-        internal static void WriteToFile(this string content, string path)
+        internal static void WriteToFile(this string content)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
             // Set Status to Locked
             _readWriteLock.EnterWriteLock();
             try
             {
                 // Append text to the file
-                using (_sw = File.CreateText(path))
+                using (_sw = File.CreateText(Configuration.LogFile.Full))
                 {
                     _sw.WriteLine(content);
                 }
@@ -42,11 +114,11 @@ namespace LogToHtml.Core
         /// </summary>
         internal static string FormatHtml(this string html)
         {
-            string result = null;
+            string result = string.Empty;
+            HtmlParser parser = new();
+            IHtmlDocument documentParser = parser.ParseDocument(html);
 
-            var parser = new HtmlParser();
-            var documentParser = parser.ParseDocument(html);
-            using (var writer = new StringWriter())
+            using (StringWriter writer = new())
             {
                 documentParser.ToHtml(writer, new PrettyMarkupFormatter
                 {

@@ -6,11 +6,11 @@ namespace LogToHtml.Models
 {
     public class LogModel
     {
-        public List<string> Projects { get; set; }
-        public string Project { get; set; }
-        public List<string> LogTypes { get; set; }
-        public LogType LogType { get; set; }
+        public List<string> Projects { get; set; } = new();
+        public string Project { get; set; } = string.Empty;
+        public List<string> LogTypes { get; set; } = new();
+        public LogLevel LogLevel { get; set; }
         public DateTime Date { get; set; }
-        public string Error { get; set; }
+        public string Error { get; set; } = string.Empty;
     }
 }

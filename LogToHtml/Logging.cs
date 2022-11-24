@@ -1,11 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Drawing;
-using System.Collections.Generic;
-
-using Pastel;
-using LogToHtml.Core;
+﻿using LogToHtml.Core;
 using LogToHtml.Models;
+using Microsoft.Extensions.Primitives;
+using Pastel;
+using Spectre.Console;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace LogToHtml
 {
@@ -13,14 +16,11 @@ namespace LogToHtml
     {
         public class Options
         {
-            public string FilePath = Path.Combine(Environment.CurrentDirectory, "logging", "loggin.html");
-            public List<string> Projects { get; set; }
-            public string Project { get; set; }
+            public string Project { get; set; } = string.Empty;
             public bool LogToConsole = false;
-            public DateTime Date = DateTime.UtcNow;
         }
 
-        public enum LogType
+        public enum LogLevel
         {
             Info,
             Warn,
@@ -28,103 +28,136 @@ namespace LogToHtml
             Critical,
         }
 
-        internal static string GlobalFilePath { get; set; }
-
-        /// <summary>Function to log an error to a .html file</summary>
-        /// <param name="options">The (global) options you specified with Logging.Options options = new() { };</param>
-        /// <param name="logType">The log level of the error</param>
-        /// <param name="message">A string of the error/exception you want to log</param>
-        /// <returns>
-        ///		<description>(DateTime date, LogType logType, string error)</description>
-        ///     <list type="number">
-        ///         <item>
-        ///             <description>"date" DateTime. Date of the error</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>"logType" LogType. Log level of the error</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>"error" string. A string containing the error/exception</description>
-        ///         </item>
-        ///     </list>
-        /// </returns>
-        public static LogResult Log(Options options, LogType logType, string message)
+        /// <summary>
+        /// Function to log a message to a .html file.
+        /// </summary>
+        /// <param name="options">The options for this log entry.</param>
+        /// <param name="level">The log level of the message.</param>
+        /// <param name="message">The message you want to log.</param>
+        /// <param name="file">File where the log occurred.</param>
+        /// <param name="method">Method where the log occurred.</param>
+        /// <param name="lineNumber">Line number where the log occurred.</param>
+        public static LogResult Log(Options options, LogLevel level, string message,
+            [CallerFilePath] string file = "",
+            [CallerMemberName] string method = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
-            if (options.Projects == null || options.Projects.Count == 0)
-                throw new Errors.Logging.NoProjectsInOptions("You haven't set any projets in your LogToHtml.Options");
+            if (options.Project == null)
+                throw new Errors.NoProjectInOptions("You didn't provide any project in your LogToHtml.Options");
+            else if (!Configuration.Projects.Contains(options.Project))
+                throw new Errors.ProjectsDoesNotContainProject($"None of the projects you provided to LogToHtml.Configuration contains {options.Project}");
             else if (string.IsNullOrEmpty(options.Project))
-                throw new Errors.Logging.NoProjectInOptions("You haven't set the project that is currently used for logging in LogToHtml.Options");
-            else if (string.IsNullOrEmpty(options.FilePath))
-                throw new ArgumentNullException("The file path set in your LogToHtml.Options is null");
+                throw new Errors.NoProjectInOptions("You haven't set the project that is currently used for logging in LogToHtml.Options");
             else
             {
-                if (options.Projects.Contains(options.Project))
+                if (options.LogToConsole)
                 {
-                    GlobalFilePath = options.FilePath;
-                    //If options.LogToConsole == true log the error to console also (with colors)
-                    if (options.LogToConsole)
-                    {
-                        string consoleError = null;
-                        switch (logType)
-                        {
-                            case LogType.Critical:
-                                consoleError = "Critical".Pastel(Color.Red);
-                                break;
-                            case LogType.Error:
-                                consoleError = "Error".Pastel(Color.Orange);
-                                break;
-                            case LogType.Warn:
-                                consoleError = "Warning".Pastel(Color.Yellow);
-                                break;
-                            case LogType.Info:
-                                consoleError = "Info".Pastel(Color.Green);
-                                break;
-                        }
-                        Console.WriteLine($"[{options.Project}] [{options.Date}] [{consoleError}] {message}");
-                    }
+                    StringBuilder logMessage = new();
+                    Configuration.ConsoleConfig config = Configuration.ConsoleConfiguration;
+                    file = Path.GetFileName(file);
+                    string color = string.Empty;
 
-                    bool fileExists = File.Exists(options.FilePath);
-                    switch (fileExists)
+                    if (config.Date)
+                        logMessage.Append(Markup.Escape($"[{Configuration.Date}] "));
+                    if (config.LogLevel)
                     {
-                        case false:
-                            // Create New file
-                            WriteLog.CreateLog(options, logType, message);
-                            break;
-                        default:
-                            WriteLog.EditLog(options, logType, message);
-                            // Edit existing file
-                            break;
+                        color = Colors.Get(level);
+                        logMessage.Append("[[");
+                        logMessage.Append($"[{color}]{level}[/]");
+                        logMessage.Append("]] ");
+                    }
+                    if (config.ProjectName)
+                        logMessage.Append(Markup.Escape($"[{options.Project}] "));
+                    if (config.FileName)
+                        logMessage.Append(Markup.Escape($"[{file}] "));
+                    if (config.MethodName)
+                        logMessage.Append(Markup.Escape($"[{method}] "));
+                    if (config.LineNumber)
+                        logMessage.Append(Markup.Escape($"[{lineNumber}] "));
+
+                    string header = logMessage.ToString().Trim();
+                    if (config.LogLevel)
+                    {
+                        // Write with color
+                        try
+                        {
+                            // Hex color
+                            AnsiConsole.MarkupLine($"{header} {Markup.Escape(message)}");
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                // RGB color
+                                AnsiConsole.MarkupLine($"{header.Replace(color, $"rgb({color})")} {Markup.Escape(message)}");
+                            }
+                            catch (Exception e)
+                            {
+                                Exception? innerException = e.InnerException;
+                                string exceptionMessage = "The color you provided isn't supported!";
+
+                                if (innerException == null)
+                                    throw new Errors.InvalidColorException(exceptionMessage);
+                                else
+                                    throw new Errors.InvalidColorException(exceptionMessage, innerException);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Write without color
+                        Console.WriteLine($"{header} {message}");
                     }
                 }
-                else
+
+                bool fileExists = File.Exists(Configuration.LogFile.Full);
+                switch (fileExists)
                 {
-                    throw new Errors.Logging.ProjectsDoesNotContainProject("The project you specified in LogToHtml.Options does not exist in the projects list");
+                    case false:
+                        // Create New file
+                        WriteLog.CreateLog(options, level, message);
+                        break;
+                    default:
+                        WriteLog.EditLog(options, level, message);
+                        // Edit existing file
+                        break;
                 }
             }
-            return new() { Date = options.Date, LogType = logType, Message = message };
+            return new() { Date = Configuration.Date, LogLevel = level, Message = message };
         }
 
-        /// <summary>Returns all of the errors logged so far</summary>
-        /// <returns>
-        ///		<description>(List<AllLogs.LogVariables> Critical, List<AllLogs.LogVariables> Error, List<AllLogs.LogVariables> Warning, List<AllLogs.LogVariables> Info)</description>
-        ///     <list type="number">
-        ///         <item>
-        ///             <description>"Critical" LogToHtml.Core.AllLogs.LogVariables. All of the errors with a critial log level</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>"Error" LogToHtml.Core.AllLogs.LogVariables. All of the errors with a error log level</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>"Warning" LogToHtml.Core.AllLogs.LogVariables. All of the errors with a warning log level</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>"Info" LogToHtml.Core.AllLogs.LogVariables. All of the errors with a info log level</description>
-        ///         </item>
-        ///     </list>
-        /// </returns>
-        public static (List<LogData> Critical, List<LogData> Error, List<LogData> Warning, List<LogData> Info) GetLogs()
+        /// <summary>
+        /// Returns all of the errors logged so far.
+        /// </summary>
+        public static Logs GetLogs()
         {
-            return (AllLogs.Critical, AllLogs.Error, AllLogs.Warn, AllLogs.Info);
+            return new()
+            {
+                Info = AllLogs.Info,
+                Warn = AllLogs.Warn,
+                Error = AllLogs.Error,
+                Critical = AllLogs.Critical,
+            };
         }
+
+        /// <summary>
+        /// Returns all log entries with the info LogLevel.
+        /// </summary>
+        public static List<LogData> GetInfoLogs() => AllLogs.Info;
+
+        /// <summary>
+        /// Returns all log entries with the warn LogLevel.
+        /// </summary>
+        public static List<LogData> GetWarnLogs() => AllLogs.Warn;
+
+        /// <summary>
+        /// Returns all log entries with the error LogLevel.
+        /// </summary>
+        public static List<LogData> GetErrorLogs() => AllLogs.Error;
+
+        /// <summary>
+        /// Returns all log entries with the critical LogLevel.
+        /// </summary>
+        public static List<LogData> GetCriticalLogs() => AllLogs.Critical;
     }
 }

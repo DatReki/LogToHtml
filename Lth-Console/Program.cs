@@ -1,4 +1,5 @@
 ﻿using LogToHtml;
+using LogToHtml.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,44 +10,74 @@ namespace Log2HtmlTester
 {
 	class Program
 	{
-		public static Logging.Options options = new()
+		#region Set options for LogToHtml
+		public static Logging.Options Options { get => options; private set => options = value; }
+
+		private static Logging.Options options = new()
 		{
-			Projects = new List<string>()
-			{
-				$"{Assembly.GetCallingAssembly().GetName().Name}"
-			},
 			Project = $"{Assembly.GetCallingAssembly().GetName().Name}",
 			LogToConsole = true
 		};
+		#endregion
 
 		public class Testing
 		{
-			public Logging.LogType TLogType { get; set; }
+			public Logging.LogLevel LogLevel { get; set; }
 			public string Error { get; set; }
 		}
 
 		static void Main(string[] args)
+		{
+			#region Default LogToHtml config
+			List<string> projects = new()
+			{
+				$"{Assembly.GetCallingAssembly().GetName().Name}"
+			};
+
+			_ = new Configuration(projects);
+			Run();
+			#endregion
+
+			#region Change ConsoleConfig
+			Configuration.ConsoleConfig consoleConfig = new()
+			{
+				Date = true,
+				FileName = true,
+				LineNumber = false,
+				LogLevel = true,
+				MethodName = false,
+				ProjectName = true,
+			};
+
+			_ = new Configuration(projects, consoleConfig: consoleConfig);
+			Run();
+			#endregion
+
+			#region Change colors
+			Configuration.Colors colors = new()
+			{
+				Info = "0, 255, 255",
+				Warn = "0,95,95",
+				Error = "#5f0000",
+				Critical = "#d75f00"
+			};
+
+			_ = new Configuration(projects, colors: colors);
+			Run();
+			#endregion
+		}
+
+		private static void Run()
 		{
 			Stopwatch s = new();
 			s.Start();
 			Console.WriteLine($"{RunRandomByAmount(100)} runs completed which took {s.Elapsed} time");
 			s.Restart();
 
-			var logs = Logging.GetLogs();
-			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warning.Count + logs.Error.Count + logs.Critical.Count}");
-			Console.WriteLine($"Getting logs took: {s.Elapsed}");
+			Logs logs = Logging.GetLogs();
+			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warn.Count + logs.Error.Count + logs.Critical.Count}");
+			Console.WriteLine($"Getting logs took: {s.Elapsed}\n\n\n");
 			s.Reset();
-		}
-
-		private static int RunSpecific()
-		{
-			Array values = Enum.GetValues(typeof(Logging.LogType));
-			for (int i = 0; i < values.Length; i++)
-			{
-				Logging.Log(options, (Logging.LogType)values.GetValue(i), $"Log number: {i}");
-			}
-
-			return 10;
 		}
 
 		private static int RunRandomByAmount(int logAmount)
@@ -54,23 +85,20 @@ namespace Log2HtmlTester
 			List<Testing> testing = new() { };
 			Random random = new();
 
-			Array values = Enum.GetValues(typeof(Logging.LogType));
+			Array values = Enum.GetValues(typeof(Logging.LogLevel));
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-			int runs = logAmount;
-
-			for (int i = 0; i < runs; i++)
+			int runs = 0;
+			for (int i = 0; i < logAmount; i++)
 			{
-				Logging.LogType randomLogType = (Logging.LogType)values.GetValue(random.Next(values.Length));
+				Logging.LogLevel randomLogType = (Logging.LogLevel)values.GetValue(random.Next(values.Length));
 				string error = new(Enumerable.Repeat(chars, 20).Select(s => s[random.Next(s.Length)]).ToArray());
-				testing.Add(new Testing { TLogType = randomLogType, Error = error });
+				testing.Add(new Testing { LogLevel = randomLogType, Error = error });
+				runs++;
 			}
 
-			foreach (var item in testing)
-			{
-				Logging.Log(options, item.TLogType, item.Error);
-			}
-			return logAmount;
+			testing.ForEach(x => Logging.Log(options, x.LogLevel, x.Error));
+			return runs;
 		}
 	}
 }
