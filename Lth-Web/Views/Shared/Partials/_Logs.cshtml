@@ -1,0 +1,32 @@
+﻿@model string
+
+@{
+    List<LogData> logs = ViewData["logs"] as List<LogData>;
+}
+
+<div class="logs">
+    <h1>@Model</h1>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < logs.Count; i++)
+                {
+                    LogData log = logs[i];
+
+                    <tr>
+                        <th scope="row">@i</th>
+                        <td>@log.Date</td>
+                        <td>@log.Error</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿using LogLevel = LogToHtml.Logging.LogLevel;
+﻿using LogLevel = LogToHtml.Log.LogLevel;
 
 namespace LogToHtml.Core
 {

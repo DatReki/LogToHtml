@@ -13,9 +13,9 @@ namespace Lth_Testing
 		public static string LogPath { get; set; } = string.Empty;
 		public static string LogFile { get; set; } = string.Empty;
 
-		public static Logging.Options Options { get => options; private set => options = value; }
+		public static Log.Options Options { get => options; private set => options = value; }
 
-		private static Logging.Options options = new()
+		private static Log.Options options = new()
 		{
 			Project = $"UnitTesting",
 			LogToConsole = false

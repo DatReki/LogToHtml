@@ -1,4 +1,5 @@
-﻿using LogToHtml;
+﻿using Bogus;
+using LogToHtml;
 
 namespace Lth_Testing
 {
@@ -6,37 +7,71 @@ namespace Lth_Testing
 	{
 		internal class TestLog
 		{
-			internal Logging.LogLevel LogLevel { get; set; }
+			internal Log.LogLevel LogLevel { get; set; }
 			internal string Message { get; set; } = string.Empty;
 		}
+
+		private static readonly Random _random = new();
 
 		/// <summary>
 		/// Write random garbage to logs.
 		/// </summary>
-		/// <param name="logAmount">The amount of garbage logs you want to generate.</param>
-		internal static int RunRandomByAmount(int logAmount)
+		/// <param name="amount">The amount of garbage logs you want to generate.</param>
+		internal static int WriteRandomLogs(int amount)
+		{
+			string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			List<string> messages = new();
+
+			for (int i = 0; i < amount; i++)
+				messages.Add(new string(Enumerable.Repeat(chars, 20).Select(s => s[_random.Next(s.Length)]).ToArray()));
+
+			return WriteLogs(messages);
+		}
+
+		/// <summary>
+		/// Write fake user creation logs.
+		/// </summary>
+		/// <param name="amount">Amount of fake user creation logs you want to generate.</param>
+		/// <returns></returns>
+		internal static int WriteFakeUserLogs(int amount)
+		{
+			Faker data = new();
+			List<string> messages = new();
+
+			for (int i = 0; i < amount; i++)
+				messages.Add($"Created new user!\n" +
+					$"Username: {data.Person.UserName}\n" +
+					$"Firstname: {data.Person.FirstName}\n" +
+					$"Lastname: {data.Person.LastName}\n" +
+					$"Email: {data.Person.Email}\n" +
+					$"Address: {data.Person.Address}\n");
+
+			return WriteLogs(messages);
+		}
+
+		/// <summary>
+		/// Write logs with a random LogLevel.
+		/// </summary>
+		/// <param name="messages">Messages you want to log.</param>
+		private static int WriteLogs(List<string> messages)
 		{
 			List<TestLog> testing = new() { };
-			Random random = new();
 
-			Array values = Enum.GetValues(typeof(Logging.LogLevel));
-			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
+			Array values = Enum.GetValues(typeof(Log.LogLevel));
 			int runs = 0;
 
-			for (int i = 0; i < logAmount; i++)
+			for (int i = 0; i < messages.Count; i++)
 			{
-				object? value = values.GetValue(random.Next(values.Length));
+				object? value = values.GetValue(_random.Next(values.Length));
 				if (value != null)
 				{
-					Logging.LogLevel randomLogType = (Logging.LogLevel)value;
-					string error = new(Enumerable.Repeat(chars, 20).Select(s => s[random.Next(s.Length)]).ToArray());
-					testing.Add(new TestLog { LogLevel = randomLogType, Message = error });
+					Log.LogLevel randomLogType = (Log.LogLevel)value;
+					testing.Add(new TestLog { LogLevel = randomLogType, Message = messages[i] });
 					runs++;
 				}
 			}
 
-			testing.ForEach(x => Logging.Log(Data.Options, x.LogLevel, x.Message));
+			testing.ForEach(x => Log.Write(Data.Options, x.LogLevel, x.Message));
 			return runs;
 		}
 	}

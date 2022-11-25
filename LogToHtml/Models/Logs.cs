@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogToHtml.Models
 {
-    public class Logs
+    public class GetLogs
     {
         public List<LogData> Critical { get; set; } = new();
         public List<LogData> Error { get; set; } = new();

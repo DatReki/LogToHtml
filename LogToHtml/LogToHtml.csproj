@@ -17,20 +17,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Core\Create\Views\MainPage.cshtml" />
-    <None Remove="Core\Create\Views\_Layout.cshtml" />
+    <None Remove="Core\Views\MainPage.cshtml" />
+    <None Remove="Core\Views\_Layout.cshtml" />
 	<None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Core\Create\Views\MainPage.cshtml" />
-    <EmbeddedResource Include="Core\Create\Views\_Layout.cshtml" />
+    <EmbeddedResource Include="Core\Views\MainPage.cshtml" />
+    <EmbeddedResource Include="Core\Views\_Layout.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
+    <PackageReference Include="AngleSharp" Version="0.17.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="Pastel" Version="3.0.1" />
+    <PackageReference Include="Pastel" Version="4.0.2" />
     <PackageReference Include="RazorLight" Version="2.3.0" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
   </ItemGroup>

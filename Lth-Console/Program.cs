@@ -1,19 +1,22 @@
-﻿using LogToHtml;
+﻿using Bogus;
+using LogToHtml;
 using LogToHtml.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using static Log2HtmlTester.Program;
 
 namespace Log2HtmlTester
 {
 	class Program
 	{
 		#region Set options for LogToHtml
-		public static Logging.Options Options { get => options; private set => options = value; }
+		public static Log.Options Options { get => options; private set => options = value; }
 
-		private static Logging.Options options = new()
+		private static Log.Options options = new()
 		{
 			Project = $"{Assembly.GetCallingAssembly().GetName().Name}",
 			LogToConsole = true
@@ -22,9 +25,11 @@ namespace Log2HtmlTester
 
 		public class Testing
 		{
-			public Logging.LogLevel LogLevel { get; set; }
-			public string Error { get; set; }
+			public Log.LogLevel LogLevel { get; set; }
+			public string Message { get; set; }
 		}
+
+		public static Random Random = new();
 
 		static void Main(string[] args)
 		{
@@ -65,40 +70,109 @@ namespace Log2HtmlTester
 			_ = new Configuration(projects, colors: colors);
 			Run();
 			#endregion
+
+			CheckLogs();
 		}
 
+		/// <summary>
+		/// Write 100 logs and check how long it took.
+		/// </summary>
 		private static void Run()
 		{
 			Stopwatch s = new();
+			int result;
+			int amount = 100;
+			int random = Random.Next(0, 1);
+
 			s.Start();
-			Console.WriteLine($"{RunRandomByAmount(100)} runs completed which took {s.Elapsed} time");
+			if (random == 0)
+				result = WriteRandomLogs(amount);
+			else
+				result = WriteFakeUserLogs(amount);
+
+			Console.WriteLine($"{result} runs completed which took {s.Elapsed.TotalSeconds} seconds");
 			s.Restart();
 
-			Logs logs = Logging.GetLogs();
+			GetLogs logs = Log.GetLogs();
 			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warn.Count + logs.Error.Count + logs.Critical.Count}");
-			Console.WriteLine($"Getting logs took: {s.Elapsed}\n\n\n");
+			Console.WriteLine($"Getting logs took: {s.Elapsed.Seconds} seconds\n\n");
 			s.Reset();
 		}
 
-		private static int RunRandomByAmount(int logAmount)
+		/// <summary>
+		/// Write random garbage to logs.
+		/// </summary>
+		/// <param name="amount">The amount of garbage logs you want to generate.</param>
+		public static int WriteRandomLogs(int amount)
+		{
+			string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			List<string> messages = new();
+
+			for (int i = 0; i < amount; i++)
+				messages.Add(new string(Enumerable.Repeat(chars, 20).Select(s => s[Random.Next(s.Length)]).ToArray()));
+
+			return WriteLogs(messages);
+		}
+
+		/// <summary>
+		/// Write fake user creation logs.
+		/// </summary>
+		/// <param name="amount">Amount of fake user creation logs you want to generate.</param>
+		public static int WriteFakeUserLogs(int amount)
+		{
+			Faker data = new();
+			List<string> messages = new();
+
+			for (int i = 0; i < amount; i++)
+				messages.Add($"Created new user!\n" +
+					$"Username: {data.Person.UserName}\n" +
+					$"Firstname: {data.Person.FirstName}\n" +
+					$"Lastname: {data.Person.LastName}\n" +
+					$"Email: {data.Person.Email}\n" +
+					$"Address: {data.Person.Address}\n" +
+					$"File: {Path.GetRandomFileName()}");
+
+			return WriteLogs(messages);
+		}
+
+		/// <summary>
+		/// Write logs with a random LogLevel.
+		/// </summary>
+		/// <param name="messages">Messages you want to log.</param>
+		private static int WriteLogs(List<string> messages)
 		{
 			List<Testing> testing = new() { };
-			Random random = new();
 
-			Array values = Enum.GetValues(typeof(Logging.LogLevel));
-			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
+			Array values = Enum.GetValues(typeof(Log.LogLevel));
 			int runs = 0;
-			for (int i = 0; i < logAmount; i++)
+
+			for (int i = 0; i < messages.Count; i++)
 			{
-				Logging.LogLevel randomLogType = (Logging.LogLevel)values.GetValue(random.Next(values.Length));
-				string error = new(Enumerable.Repeat(chars, 20).Select(s => s[random.Next(s.Length)]).ToArray());
-				testing.Add(new Testing { LogLevel = randomLogType, Error = error });
-				runs++;
+				object? value = values.GetValue(Random.Next(values.Length));
+				if (value != null)
+				{
+					Log.LogLevel randomLogType = (Log.LogLevel)value;
+					testing.Add(new Testing { LogLevel = randomLogType, Message = messages[i] });
+					runs++;
+				}
 			}
 
-			testing.ForEach(x => Logging.Log(options, x.LogLevel, x.Error));
+			testing.ForEach(x => Log.Write(Options, x.LogLevel, x.Message));
 			return runs;
+		}
+
+		private static void CheckLogs()
+		{
+			int info = Log.GetInfoLogs().Count;
+			int warn = Log.GetWarnLogs().Count;
+			int error = Log.GetErrorLogs().Count;
+			int critical = Log.GetCriticalLogs().Count;
+
+			Console.WriteLine($"All logs: {info + warn + error + critical}\n" +
+				$"Info: {info}\n" +
+				$"Warn: {warn}\n" +
+				$"Error: {error}\n" +
+				$"Critical: {critical}");
 		}
 	}
 }

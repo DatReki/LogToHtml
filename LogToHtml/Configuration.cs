@@ -183,12 +183,15 @@ namespace LogToHtml
                         object? value = property.GetValue(colors, null);
                         if (value != null)
                         {
-                            string color = value.ToString();
-                            Check colorCheck = CheckIfColor(color);
-                            if (colorCheck.Type == Check.Types.Rgb)
-                                property.SetValue(colors, colorCheck.Color);
-                            else if (!colorCheck.Result)
-                                throw new Errors.InvalidColorException($"{color} is not a valid hex or rgb color!");
+                            string? color = value.ToString();
+                            if (color != null)
+                            {
+                                Check colorCheck = CheckIfColor(color);
+                                if (colorCheck.Type == Check.Types.Rgb)
+                                    property.SetValue(colors, colorCheck.Color);
+                                else if (!colorCheck.Result)
+                                    throw new Errors.InvalidColorException($"{color} is not a valid hex or rgb color!");
+                            }
                         }
                     }
                 }
