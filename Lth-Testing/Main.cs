@@ -12,12 +12,7 @@ namespace Lth_Testing
 			Data.LogFile = "log.html";
 			Data.LogPath = Path.Combine(Path.GetTempPath(), "LogToHtml");
 
-			List<string> projects = new()
-			{
-				Data.Options.Project
-			};
-
-			_ = new Configuration(projects, Data.Full());
+			_ = new Configuration(Data.Projects, Data.Full());
 
 			Directory.CreateDirectory(Data.LogPath);
 		}

@@ -3,9 +3,11 @@ using LogToHtml.Models;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using static LogToHtml.Core.Data;
 
 namespace LogToHtml
@@ -105,7 +107,7 @@ namespace LogToHtml
 					string color = string.Empty;
 
 					if (config.Date)
-						logMessage.Append(Markup.Escape($"[{Configuration.Date}] "));
+						logMessage.Append(Markup.Escape($"[{Configuration.TimeZone.GetTime()}] "));
 					if (config.LogLevel)
 					{
 						color = Colors.Get(level);
@@ -140,13 +142,7 @@ namespace LogToHtml
 							}
 							catch (Exception e)
 							{
-								Exception? innerException = e.InnerException;
-								string exceptionMessage = "The color you provided isn't supported!";
-
-								if (innerException == null)
-									throw new Errors.InvalidColorException(exceptionMessage);
-								else
-									throw new Errors.InvalidColorException(exceptionMessage, innerException);
+								throw new Errors.InvalidColorException("The color you provided isn't supported!", e);
 							}
 						}
 					}
@@ -156,7 +152,6 @@ namespace LogToHtml
 						Console.WriteLine($"{header} {message}");
 					}
 				}
-
 				bool fileExists = File.Exists(Configuration.LogFile.Full);
 				switch (fileExists)
 				{
@@ -170,7 +165,7 @@ namespace LogToHtml
 						break;
 				}
 			}
-			return new() { Date = Configuration.Date, LogLevel = level, Message = message };
+			return new() { Date = Configuration.TimeZone.GetTime(), LogLevel = level, Message = message };
 		}
 
 		/// <summary>

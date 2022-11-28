@@ -1,9 +1,9 @@
 ﻿@{
 	ViewData["Title"] = "Multiple Logs";
-	IEnumerable<string> result = null;
-	if (ViewData.ContainsKey("postedLogs"))
+	string result = string.Empty;
+	if (ViewData.ContainsKey("result"))
 	{
-		result = ViewData["postedLogs"] as IEnumerable<string>;
+		result = ViewData["result"] as string;
 	}
 }
 @section Css
@@ -43,19 +43,10 @@
 			<button class="btn btn-primary" type="submit">Submit form</button>
 		</div>
 	</form>
-	@if (result != null)
+
+	@if (!string.IsNullOrEmpty(result))
 	{
-		<p>@result.Last()</p>
-		<table>
-			<tr>
-				<th>Logs</th>
-			</tr>
-			@for (int i = 0; i < (result.Count() - 1); i++)
-			{
-				<tr>
-					<td>@result.ElementAt(i)</td>
-				</tr>
-			}
-		</table>
+		<hr />
+		<p>@result</p>
 	}
 </div>

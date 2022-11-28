@@ -1,4 +1,5 @@
-﻿using LogToHtml;
+﻿using ByteSizeLib;
+using LogToHtml;
 using LogToHtml.Models;
 using System.Text;
 
@@ -45,7 +46,7 @@ namespace Lth_Testing
 		{
 			int toRun = 200;
 			int ran = Functions.WriteRandomLogs(toRun);
-			WriteLogCount += toRun;
+			WriteLogCount += ran;
 			Assert.That(ran, Is.EqualTo(toRun));
 		}
 
@@ -57,7 +58,7 @@ namespace Lth_Testing
 		{
 			int toRun = 200;
 			int ran = Functions.WriteFakeUserLogs(toRun);
-			WriteLogCount += toRun;
+			WriteLogCount += ran;
 			Assert.That(ran, Is.EqualTo(toRun));
 		}
 
@@ -112,6 +113,19 @@ namespace Lth_Testing
 		public void WrittenLogsEqualsGottenLogs()
 		{
 			Assert.That(WriteLogCount, Is.EqualTo(GetLogCount));
+		}
+
+		/// <summary>
+		/// Check if the 'maxSize' option in 'LogToHtml.Configuration' actually works.
+		/// </summary>
+		[Test, Order(10)]
+		public void CheckMaxSize()
+		{
+			_ = new Configuration(Data.Projects, Data.Full(), maxSize: (int)ByteSize.FromKiloBytes(100).Bytes);
+			Functions.WriteFakeUserLogs(600);
+
+			bool filesExist = Directory.GetFiles(Data.LogPath).Length > 1;
+			Assert.That(filesExist, Is.EqualTo(true));
 		}
 	}
 }

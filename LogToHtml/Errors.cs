@@ -59,5 +59,16 @@ namespace LogToHtml
 			public ProjectsDoesNotContainProject(string message)
 				: base(message) { }
 		}
+
+		/// <summary>
+		/// For some reason the log file cannot be moved.
+		/// </summary>
+		[Serializable]
+		public class CannotMoveLogFile : Exception
+		{
+			public CannotMoveLogFile() { }
+
+			public CannotMoveLogFile(string message, Exception innerException) : base(message, innerException) { }
+		}
 	}
 }

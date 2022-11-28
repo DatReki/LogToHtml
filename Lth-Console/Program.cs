@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using ByteSizeLib;
 using LogToHtml;
 using LogToHtml.Models;
 using System;
@@ -7,7 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using static Log2HtmlTester.Program;
+using System.Text;
 
 namespace Log2HtmlTester
 {
@@ -30,71 +31,142 @@ namespace Log2HtmlTester
 		}
 
 		public static Random Random = new();
+		public static TimeSpan Duration { get; set; } = new();
+		public static int ExpectedTotalLogsWritten { get; set; }
+		public static int TotalLogsWritten { get; set; }
 
 		static void Main(string[] args)
 		{
-			#region Default LogToHtml config
+			string location = Path.Combine(Environment.CurrentDirectory, "logs", "log.html");
+			Console.WriteLine($"Log file location: {location}\n");
+
+			Console.WriteLine($"Run general (1) or log integers (2)");
+			string result = Console.ReadLine();
+
 			List<string> projects = new()
 			{
 				$"{Assembly.GetCallingAssembly().GetName().Name}"
 			};
+			int maxSize = (int)ByteSize.FromMegaBytes(1).Bytes;
 
-			_ = new Configuration(projects);
-			Run();
-			#endregion
-
-			#region Change ConsoleConfig
-			Configuration.ConsoleConfig consoleConfig = new()
+			if (result == "2")
 			{
-				Date = true,
-				FileName = true,
-				LineNumber = false,
-				LogLevel = true,
-				MethodName = false,
-				ProjectName = true,
-			};
+				_ = new Configuration(projects, location, maxSize: maxSize);
 
-			_ = new Configuration(projects, consoleConfig: consoleConfig);
-			Run();
-			#endregion
-
-			#region Change colors
-			Configuration.Colors colors = new()
+				RunCounter(600);
+			}
+			else
 			{
-				Info = "0, 255, 255",
-				Warn = "0,95,95",
-				Error = "#5f0000",
-				Critical = "#d75f00"
-			};
+				#region Default LogToHtml config
+				_ = new Configuration(projects, location);
+				Run();
+				#endregion
 
-			_ = new Configuration(projects, colors: colors);
-			Run();
-			#endregion
+				#region Change ConsoleConfig
+				Configuration.ConsoleConfig consoleConfig = new()
+				{
+					Date = true,
+					FileName = true,
+					LineNumber = false,
+					LogLevel = true,
+					MethodName = false,
+					ProjectName = true,
+				};
 
-			CheckLogs();
+				_ = new Configuration(projects, location, consoleConfig: consoleConfig);
+				Run();
+				#endregion
+
+				#region Change colors
+				Configuration.Colors colors = new()
+				{
+					Info = "0, 255, 255",
+					Warn = "0,95,95",
+					Error = "#5f0000",
+					Critical = "#d75f00"
+				};
+
+				_ = new Configuration(projects, location, colors: colors);
+				Run();
+				#endregion
+
+				#region Set max size
+
+				_ = new Configuration(projects, location, maxSize);
+				Run();
+				#endregion
+			}
+
+			Console.WriteLine($"Time it took for all runs: {Duration.Seconds} seconds\n" +
+				$"How many logs are supposed to be written: {ExpectedTotalLogsWritten}\n" +
+				$"How many logs are actually written: {TotalLogsWritten}\n");
 		}
 
 		/// <summary>
 		/// Write 100 logs and check how long it took.
 		/// </summary>
-		private static void Run()
+		private static void Run(int? runs = null)
 		{
 			Stopwatch s = new();
+			int amount;
+			int random = Random.Next(1, 2);
 			int result;
-			int amount = 100;
-			int random = Random.Next(0, 1);
 
+			if (runs == null)
+				amount = 100;
+			else
+				amount = (int)runs;
+
+			ExpectedTotalLogsWritten += amount;
 			s.Start();
-			if (random == 0)
+
+			if (random == 1)
 				result = WriteRandomLogs(amount);
 			else
 				result = WriteFakeUserLogs(amount);
 
-			Console.WriteLine($"{result} runs completed which took {s.Elapsed.TotalSeconds} seconds");
+			TimeSpan elapsed = s.Elapsed;
+			Duration += elapsed;
+			TotalLogsWritten += result;
+			Console.WriteLine($"{result} runs completed which took {elapsed.TotalSeconds} seconds");
 			s.Restart();
 
 			GetLogs logs = Log.GetLogs();
-			Console.WriteLine($"Total amount of logs gotten: {logs.Info.Count + logs.Warn.Count + logs.Error.Count + logs.Critical.Count}");
+			int logCount = logs.Info.Count + logs.Warn.Count + logs.Error.Count + logs.Critical.Count;
+			Console.WriteLine($"Total amount of logs gotten: {logCount}");
+			Console.WriteLine($"Getting logs took: {s.Elapsed.Seconds} seconds\n\n");
+			s.Reset();
+		}
+
+		public static void RunCounter(int? runs)
+		{
+			Stopwatch s = new();
+			int amount;
+			int result = 0;
+
+			if (runs == null)
+				amount = 100;
+			else
+				amount = (int)runs;
+
+			ExpectedTotalLogsWritten += amount;
+			s.Start();
+
+			for (int i = 0; i < amount; i++)
+			{
+				Log.Info(options, $"{i}");
+				result++;
+			}
+
+			TimeSpan elapsed = s.Elapsed;
+			Duration += elapsed;
+			TotalLogsWritten += result;
+			Console.WriteLine($"{result} runs completed which took {elapsed.TotalSeconds} seconds");
+			s.Restart();
+
+			GetLogs logs = Log.GetLogs();
+			int logCount = logs.Info.Count + logs.Warn.Count + logs.Error.Count + logs.Critical.Count;
+			Console.WriteLine($"Total amount of logs gotten: {logCount}");
 			Console.WriteLine($"Getting logs took: {s.Elapsed.Seconds} seconds\n\n");
 			s.Reset();
 		}
@@ -159,20 +231,6 @@ namespace Log2HtmlTester
 
 			testing.ForEach(x => Log.Write(Options, x.LogLevel, x.Message));
 			return runs;
-		}
-
-		private static void CheckLogs()
-		{
-			int info = Log.GetInfoLogs().Count;
-			int warn = Log.GetWarnLogs().Count;
-			int error = Log.GetErrorLogs().Count;
-			int critical = Log.GetCriticalLogs().Count;
-
-			Console.WriteLine($"All logs: {info + warn + error + critical}\n" +
-				$"Info: {info}\n" +
-				$"Warn: {warn}\n" +
-				$"Error: {error}\n" +
-				$"Critical: {critical}");
 		}
 	}
 }

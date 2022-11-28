@@ -3,6 +3,7 @@ using LogToHtml.Models;
 using RazorLight;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using static LogToHtml.Core.Data;
 using static LogToHtml.Log;
@@ -57,18 +58,18 @@ namespace LogToHtml.Core
 		/// Creates the .html file from an embedded .cshtml file. This will be used as our log file.
 		/// </summary>
 		/// <param name="options">Options for the log entry.</param>
-		/// <param name="logType">The logs LogType.</param>
+		/// <param name="logLevel">The logs LogLevel.</param>
 		/// <param name="message">The message associated with the log.</param>
-		internal static async void Create(Options options, LogLevel logType, string message)
+		internal static async void Create(Options options, LogLevel logLevel, string message)
 		{
 			// Create & format a HTML file from the embedded .cshtml file
 			_html = (await Render.RenderViewAsync()).FormatHtml();
 			// Add first log entry to the log file
-			string logHtml = AddLogEntry(options, logType, message).FormatHtml();
+			string logHtml = AddLogEntry(options, logLevel, message).FormatHtml();
 			// Indicate we don't need to read from the log file as we just created a new one
 			_readLogFile = false;
 			// Add log to list of all logs
-			AddToListOfLogs(options.Project, Configuration.Date, logType, message);
+			AddToListOfLogs(options.Project, Configuration.TimeZone.GetTime(), logLevel, message);
 			// Update static HTML string
 			_html = logHtml;
 			// Add new entry to log file
@@ -89,7 +90,7 @@ namespace LogToHtml.Core
 				_readLogFile = false;
 			}
 			else
-				AddToListOfLogs(options.Project, Configuration.Date, logType, message);
+				AddToListOfLogs(options.Project, Configuration.TimeZone.GetTime(), logType, message);
 
 			// Add log to HTML string
 			string html = AddLogEntry(options, logType, message);
@@ -99,6 +100,9 @@ namespace LogToHtml.Core
 			_html = html;
 			// Write updated HTML string to log file
 			html.WriteToFile();
+			// Move file if it exceeds maximum size.
+			if (html.Length > Configuration.MaxSize)
+				MoveFile(0);
 		}
 
 		/// <summary>
@@ -168,6 +172,61 @@ namespace LogToHtml.Core
 		}
 
 		/// <summary>
+		/// Try move old log file if it exceeds the size limit.
+		/// </summary>
+		/// <param name="date">DateTime of when the log is being written.</param>
+		/// <param name="level">Level of the filename (0/1) higher = more complex filename.</param>
+		private static void MoveFile(int level)
+		{
+			_readLogFile = true;
+			_html = string.Empty;
+
+			// Name of the log file directory
+			string directory = Configuration.LogFile.Directory;
+			// Name of the log file
+			string filename = Configuration.LogFile.FileName;
+			// Extension of the log file
+			string extension = Configuration.LogFile.Extension;
+			// Full path of the current log file
+			string original = Configuration.LogFile.Full;
+			// Current date
+			DateTime date = Configuration.TimeZone.GetTime();
+
+			// dd/mm/yyyy format
+			string friendlyShortDate = date.ToShortDateString().Replace('/', '_');
+			// If that file already exists create one with hours:minutes:seconds:miliseconds format
+			string filenameAddition = level switch
+			{
+				// If filename with 'date + short time' exists create one with hours:minutes:seconds:miliseconds format
+				1 => $"{friendlyShortDate}-{date.ToString("hh:mm:ss.fff").Replace(' ', '-').Replace(':', '_')}",
+				// Try create log file with just date + short time
+				_ => $"{friendlyShortDate}-{date.ToShortTimeString().Replace(':', '_')}",
+			};
+
+			string newLocation = string.Empty;
+			try
+			{
+				// Complete path for new file
+				newLocation = Path.Combine(directory, $"{filename}-{filenameAddition}{extension}");
+				// Move old log file
+				File.Move(original, newLocation);
+			}
+			catch (Exception e)
+			{
+				switch (e.HResult)
+				{
+					case -2147024713:
+						MoveFile(1);
+						break;
+					default:
+						throw new Errors.CannotMoveLogFile("Log file cannot be moved. " +
+						"Either the application is missing file permissions or " +
+						"'Configuration.MaxSize' is too low.", e);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Updates the .html file to add a new entry.
 		/// </summary>
 		/// <param name="options">Options for the new entry.</param>
@@ -177,7 +236,7 @@ namespace LogToHtml.Core
 		private static string AddLogEntry(Options options, LogLevel logLevel, string message)
 		{
 			HtmlDocument document = new();
-			// If 'Html' is empty load from file.
+			// If '_html' is empty load from file.
 			// Otherwise load from string.
 			if (string.IsNullOrEmpty(_html))
 			{
@@ -192,7 +251,7 @@ namespace LogToHtml.Core
 				<tr>
 					<td class=""dates"">
                         <p>
-                            {DateTime.Now}
+                            {Configuration.TimeZone.GetTime()}
                         </p>
                     </td>
 					<td class=""messages"">

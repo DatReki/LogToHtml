@@ -1,112 +1,85 @@
 ﻿using LogToHtml;
 using Lth_Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Lth_Web.Controllers
 {
-    public class HomeController : Controller
-    {
-        private static readonly Random _random = new();
+	public class HomeController : Controller
+	{
+		public IActionResult Index()
+		{
+			if (TempData["postedAccountForm"] != null)
+				ViewData["postedAccountForm"] = TempData["postedAccountForm"];
 
-        public IActionResult Index()
-        {
-            if (TempData["postedAccountForm"] != null)
-                ViewData["postedAccountForm"] = TempData["postedAccountForm"];
+			return View();
+		}
 
-            return View();
-        }
+		[HttpPost]
+		public IActionResult Login()
+		{
+			string firstname = Request.Form["firstname"].ToString();
+			string lastname = Request.Form["lastname"].ToString();
+			string username = Request.Form["username"].ToString();
+			string invalid = Request.Form["invalidcheck"].ToString();
 
-        [HttpPost]
-        public IActionResult Login()
-        {
-            string firstname = Request.Form["firstname"].ToString();
-            string lastname = Request.Form["lastname"].ToString();
-            string username = Request.Form["username"].ToString();
-            string invalid = Request.Form["invalidcheck"].ToString();
+			Stopwatch sw = new();
+			sw.Start();
+			Log.Info(Startup.Options, $"Created new user: {username}");
+			sw.Stop();
 
-            Stopwatch sw = new();
-            sw.Start();
-            Log.Info(Startup.Options, $"Created new user: {username}");
-            sw.Stop();
+			List<string> data = new()
+			{
+				firstname,
+				lastname,
+				username,
+				invalid,
+				$"{Math.Round(sw.Elapsed.TotalSeconds, 3)} seconds"
+			};
+			sw.Reset();
 
-            List<string> data = new()
-            {
-                firstname,
-                lastname,
-                username,
-                invalid,
-                $"{sw.Elapsed.TotalSeconds} seconds"
-            };
-            sw.Reset();
+			TempData["postedAccountForm"] = data;
 
-            TempData["postedAccountForm"] = data;
+			return RedirectToAction("Index", "Home");
+		}
 
-            return RedirectToAction("Index", "Home");
-        }
+		public IActionResult Reset() => RedirectToAction("Index", "Home");
 
-        public IActionResult Reset() => RedirectToAction("Index", "Home");
+		public IActionResult AddMultipleLogs()
+		{
+			if (TempData["result"] != null)
+				ViewData["result"] = TempData["result"];
 
-        public IActionResult AddMultipleLogs()
-        {
-            if (TempData["postedLogs"] != null)
-            {
-                ViewData["postedLogs"] = TempData["postedLogs"];
-            }
-            return View();
-        }
+			return View();
+		}
 
-        public class GenerateLogsVariables
-        {
-            public Log.LogLevel LogType { get; set; }
-            public string Error { get; set; }
-        }
+		public class GenerateLogsVariables
+		{
+			public Log.LogLevel LogType { get; set; }
+			public string Error { get; set; }
+		}
 
-        [HttpPost]
-        public IActionResult GenerateLogs()
-        {
-            List<GenerateLogsVariables> logList = new() { };
+		[HttpPost]
+		public IActionResult GenerateLogs()
+		{
+			Stopwatch sw = new();
+			int runs = int.Parse(Request.Form["amount"].ToString());
+			sw.Start();
+			int completed = Core.Functions.WriteRandomLogs(runs);
+			sw.Stop();
 
-            Array values = Enum.GetValues(typeof(Log.LogLevel));
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			string result = $"It took {Math.Round(sw.Elapsed.TotalSeconds, 3)} seconds to write {completed} logs";
+			TempData["result"] = result;
 
-            int runs = Int32.Parse(Request.Form["amount"].ToString());
+			return RedirectToAction("AddMultipleLogs", "Home");
+		}
 
-            for (int i = 0; i < runs; i++)
-            {
-                Log.LogLevel randomLogType = (Log.LogLevel)values.GetValue(_random.Next(values.Length));
-                string error = new(Enumerable.Repeat(chars, 20).Select(s => s[_random.Next(s.Length)]).ToArray());
-                logList.Add(new GenerateLogsVariables { LogType = randomLogType, Error = error });
-            }
-
-            List<string> data = new();
-
-            Stopwatch sw = new();
-            sw.Start();
-            foreach (GenerateLogsVariables item in logList)
-            {
-                data.Add(item.Error);
-                Log.Write(Startup.Options, item.LogType, item.Error);
-            }
-            sw.Stop();
-            data.Add($"Time it took for logging: {sw.Elapsed.TotalSeconds} seconds");
-
-            TempData["postedLogs"] = data;
-
-            return RedirectToAction("AddMultipleLogs", "Home");
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+		}
+	}
 }
