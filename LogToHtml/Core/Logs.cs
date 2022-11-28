@@ -102,7 +102,7 @@ namespace LogToHtml.Core
 			html.WriteToFile();
 			// Move file if it exceeds maximum size.
 			if (html.Length > Configuration.MaxSize)
-				MoveFile(0);
+				MoveFile();
 		}
 
 		/// <summary>
@@ -174,9 +174,7 @@ namespace LogToHtml.Core
 		/// <summary>
 		/// Try move old log file if it exceeds the size limit.
 		/// </summary>
-		/// <param name="date">DateTime of when the log is being written.</param>
-		/// <param name="level">Level of the filename (0/1) higher = more complex filename.</param>
-		private static void MoveFile(int level)
+		private static void MoveFile()
 		{
 			_readLogFile = true;
 			_html = string.Empty;
@@ -192,38 +190,47 @@ namespace LogToHtml.Core
 			// Current date
 			DateTime date = Configuration.TimeZone.GetTime();
 
-			// dd/mm/yyyy format
-			string friendlyShortDate = date.ToShortDateString().Replace('/', '_');
-			// If that file already exists create one with hours:minutes:seconds:miliseconds format
-			string filenameAddition = level switch
-			{
-				// If filename with 'date + short time' exists create one with hours:minutes:seconds:miliseconds format
-				1 => $"{friendlyShortDate}-{date.ToString("hh:mm:ss.fff").Replace(' ', '-').Replace(':', '_')}",
-				// Try create log file with just date + short time
-				_ => $"{friendlyShortDate}-{date.ToShortTimeString().Replace(':', '_')}",
-			};
-
-			string newLocation = string.Empty;
 			try
 			{
-				// Complete path for new file
-				newLocation = Path.Combine(directory, $"{filename}-{filenameAddition}{extension}");
-				// Move old log file
-				File.Move(original, newLocation);
+				for (int i = 0; i < 3; i++)
+				{
+					string newPath = Path.Combine(directory, $"{filename}-{SetFileName(i, date)}{extension}");
+					if (!File.Exists(newPath))
+						File.Move(original, newPath);
+					else if (i == 2)
+						throw new Errors.CannotMoveLogFile("Could not move the log file. " +
+							"Please make sure the 'LogToHtml.Configuration.MaxSize' variable isn't set too low (usually 75kb or higher works fine).");
+				}
 			}
 			catch (Exception e)
 			{
-				switch (e.HResult)
-				{
-					case -2147024713:
-						MoveFile(1);
-						break;
-					default:
-						throw new Errors.CannotMoveLogFile("Log file cannot be moved. " +
-						"Either the application is missing file permissions or " +
-						"'Configuration.MaxSize' is too low.", e);
-				}
+				if (e is FileNotFoundException)
+					return;
+				else
+					throw new Errors.CannotMoveLogFile("Something went wrong while trying to move the log file!", e);
 			}
+		}
+
+		/// <summary>
+		/// Try and set a new filename for the log file when it's being moved.
+		/// </summary>
+		/// <param name="level">Naming level from 1 to 3.</param>
+		/// <param name="date"></param>
+		private static string SetFileName(int level, DateTime date)
+		{
+			string shortDate = date.ToShortDateString().Replace('/', '_');
+			string shortTime = date.ToShortTimeString().Replace(':', '_');
+			string shortestTime = date.ToString("ss.fff").Replace(' ', '-').Replace(':', '_');
+
+			return level switch
+			{
+				// dd/mm/yyyy format
+				0 => $"{shortDate}",
+				// Try create log file with just date + short time
+				1 => $"{shortDate}-{shortTime}",
+				// If filename with 'date + short time' exists create one with hours:minutes:seconds:miliseconds format
+				_ => $"{shortDate}-{shortTime}-{shortestTime}",
+			};
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Bogus.DataSets;
 using ByteSizeLib;
 using LogToHtml;
 using LogToHtml.Models;
@@ -47,13 +48,13 @@ namespace Log2HtmlTester
 			{
 				$"{Assembly.GetCallingAssembly().GetName().Name}"
 			};
-			int maxSize = (int)ByteSize.FromMegaBytes(1).Bytes;
+			int maxSize = (int)ByteSize.FromKiloBytes(75).Bytes;
 
 			if (result == "2")
 			{
 				_ = new Configuration(projects, location, maxSize: maxSize);
 
-				RunCounter(600);
+				RunCounter(1200);
 			}
 			else
 			{

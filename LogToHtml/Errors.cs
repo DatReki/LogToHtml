@@ -56,8 +56,7 @@ namespace LogToHtml
 		{
 			public ProjectsDoesNotContainProject() { }
 
-			public ProjectsDoesNotContainProject(string message)
-				: base(message) { }
+			public ProjectsDoesNotContainProject(string message) : base(message) { }
 		}
 
 		/// <summary>
@@ -67,6 +66,8 @@ namespace LogToHtml
 		public class CannotMoveLogFile : Exception
 		{
 			public CannotMoveLogFile() { }
+
+			public CannotMoveLogFile(string message) : base(message) { }
 
 			public CannotMoveLogFile(string message, Exception innerException) : base(message, innerException) { }
 		}
