@@ -39,7 +39,7 @@ namespace Log2HtmlTester
 			string location = Path.Combine(Environment.CurrentDirectory, "logs", "log.html");
 			Console.WriteLine($"Log file location: {location}\n");
 
-			Console.WriteLine($"Run general (1) or log integers (2)");
+			Console.WriteLine($"Please select one of the following options:\ngeneral (1)\nlog integers (2)\nimage example (3)");
 			string result = Console.ReadLine();
 
 			List<string> projects = new()
@@ -53,6 +53,12 @@ namespace Log2HtmlTester
 				_ = new Configuration(projects, location, maxSize: maxSize);
 
 				RunCounter(1200);
+			}
+			else if (result == "3")
+			{
+				_ = new Configuration(projects, location);
+
+				ExampleImage();
 			}
 			else
 			{
@@ -168,6 +174,14 @@ namespace Log2HtmlTester
 			Console.WriteLine($"Total amount of logs gotten: {logCount}");
 			Console.WriteLine($"Getting logs took: {s.Elapsed.Seconds} seconds\n\n");
 			s.Reset();
+		}
+
+		public static void ExampleImage()
+		{
+			Log.Info(options, "Information");
+			Log.Warn(options, "Warning");
+			Log.Error(options, "Error");
+			Log.Critical(options, "Critical");
 		}
 
 		/// <summary>

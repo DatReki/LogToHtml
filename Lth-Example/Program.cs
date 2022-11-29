@@ -21,7 +21,9 @@ namespace Lth_Example
 
 		static void Main(string[] args)
 		{
-			#region Configure global options (these are applied across all projects in a solution)
+			#region Configure global options 
+			// These are applied across all projects in a solution.
+
 			// [Required]
 			// A List of projects that the logger is used for.
 			// If you only use the logger in a single project assign the same value here as you did in 'Options.Project'
@@ -56,6 +58,8 @@ namespace Lth_Example
 			// Change what get's written to the console.
 			Configuration.ConsoleConfig consoleConfig = new()
 			{
+				// If console displays LogLevel in color
+				Color = true,
 				Date = true,
 				FileName = true,
 				LineNumber = false,

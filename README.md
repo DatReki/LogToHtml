@@ -1,4 +1,4 @@
-# Log2Html
+# LoToHtml
 
 <a href="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml">
     <img src="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml/badge.svg" />
@@ -13,9 +13,7 @@
 A small library to write logs to a .html file.
 The HTML file's structure is based on an embedded .cshtml file.
 
-Currently tested working on Linux & Windows.
-
-<img src="https://cdn.discordapp.com/attachments/406006274661154818/892449912980131920/unknown.png" alt="ExampleImage.png">
+<img src="https://i.imgur.com/pzM1BDj.png" alt="LogToHtml.png">
 
 ## Usage
 Write a log
@@ -42,57 +40,59 @@ namespace Example
 
         static void Main(string[] args)
         {
-            #region Configure global options 
-			//(these are applied across all projects in a solution)
-            
+			#region Configure global options 
+			// These are applied across all projects in a solution.
+
 			// [Required]
-            // A List of projects that the logger is used for.
-            // If you only use the logger in a single project assign the same value here as you did in 'Options.Project'
-            List<string> projects = new()
-            {
-                $"{Assembly.GetCallingAssembly().GetName().Name}"
-            };
+			// A List of projects that the logger is used for.
+			// If you only use the logger in a single project assign the same value here as you did in 'Options.Project'
+			List<string> projects = new()
+			{
+				$"{Assembly.GetCallingAssembly().GetName().Name}"
+			};
 
-            // [Optional]
-            // The path where the log file is located.
-            string logpath = Path.Combine(Environment.CurrentDirectory, "logs", "log.html");
+			// [Optional]
+			// The path where the log file is located.
+			string logpath = Path.Combine(Environment.CurrentDirectory, "logs", "log.html");
 
-            // [Optional]
-            // Set the maximum size of a log file (example has a max size of 1 MB).
-            int maxSize = 1000000;
+			// [Optional]
+			// Set the maximum size of a log file (example has a max size of 1 MB).
+			int maxSize = 1000000;
 
-            // [Optional]
-            // Set what timezone the library uses.
-            TimeZoneInfo timezone = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
+			// [Optional]
+			// Set what timezone the library uses.
+			TimeZoneInfo timezone = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
 
-            // [Optional]
-            // Change what colors the library writes to the console based on LogLevel.
-            Configuration.Colors colors = new()
-            {
-                Info = "0, 255, 255",
-                Warn = "0,95,95",
-                Error = "#5f0000",
-                Critical = "#d75f00"
-            };
+			// [Optional]
+			// Change what colors the library writes to the console based on LogLevel.
+			Configuration.Colors colors = new()
+			{
+				Info = "0, 255, 255",
+				Warn = "0,95,95",
+				Error = "#5f0000",
+				Critical = "#d75f00"
+			};
 
-            // [Optional]
-            // Change what get's written to the console.
-            Configuration.ConsoleConfig consoleConfig = new()
-            {
-                Date = true,
-                FileName = true,
-                LineNumber = false,
-                LogLevel = true,
-                MethodName = false,
-                ProjectName = true
-            };
+			// [Optional]
+			// Change what get's written to the console.
+			Configuration.ConsoleConfig consoleConfig = new()
+			{
+				// If console displays LogLevel in color
+				Color = true,
+				Date = true,
+				FileName = true,
+				LineNumber = false,
+				LogLevel = true,
+				MethodName = false,
+				ProjectName = true
+			};
 
-            // You only need to set this once in your entire solution.
-            _ = new Configuration(projects, logpath, maxSize, timezone, colors, consoleConfig);
-            #endregion
+			// You only need to set this once in your entire solution.
+			_ = new Configuration(projects, logpath, maxSize, timezone, colors, consoleConfig);
+			#endregion
 
-            // And now you can start logging
-            Log.Info(Options, $"This is a test message");
+			// And now you can start logging
+			Log.Info(Options, $"This is a test message");
         }
     }
 }
