@@ -30,7 +30,6 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.17.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="Pastel" Version="4.0.2" />
     <PackageReference Include="RazorLight" Version="2.3.0" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
   </ItemGroup>

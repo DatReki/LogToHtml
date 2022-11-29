@@ -1,5 +1,3 @@
-using System;
-
 namespace Lth_Web.Models
 {
 	public class ErrorViewModel

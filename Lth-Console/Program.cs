@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using Bogus.DataSets;
 using ByteSizeLib;
 using LogToHtml;
 using LogToHtml.Models;
@@ -9,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Log2HtmlTester
 {

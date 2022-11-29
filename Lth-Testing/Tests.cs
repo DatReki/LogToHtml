@@ -1,7 +1,6 @@
 ﻿using ByteSizeLib;
 using LogToHtml;
 using LogToHtml.Models;
-using System.Text;
 
 namespace Lth_Testing
 {
