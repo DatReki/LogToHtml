@@ -1,0 +1,36 @@
+﻿@section Css
+{
+		<style>
+		</style>
+}
+
+@section Js
+	{
+		<script>
+			// The HTML from the log file
+			const html = '@ViewData["html"]';
+
+			// Decode html string
+			function htmlDecode(input) {
+				var doc = new DOMParser().parseFromString(input, "text/html");
+				return doc.documentElement.textContent;
+			}
+
+			// Wait for page to fully load
+			window.addEventListener("load", (event) => {
+				const parser = new DOMParser();
+				// HTML string
+				const doc = parser.parseFromString(htmlDecode(html), "text/html");
+				// Get head elements from (string) html
+				const head = doc.getElementsByTagName('head')[0].innerHTML;
+				// Get body elements from (string) html
+				const body = doc.getElementsByTagName('body')[0].innerHTML;
+				// Write head from log file to iframe
+				$("#logs").contents().find("head").html(head);
+				// Write body from log file to iframe
+				$("#logs").contents().find("body").html(body);
+			});
+		</script>
+}
+
+<iframe id="logs" sandbox="allow-same-origin allow-scripts" style="width: 100%;height: 100vh;"></iframe>

@@ -1,19 +1,6 @@
-# LoToHtml
-
-<a href="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml">
-    <img src="https://github.com/DatReki/LogToHtml/actions/workflows/dotnet.yml/badge.svg" />
-</a>
-<a href="https://www.nuget.org/packages/LogToHtml/">
-    <img src="https://img.shields.io/nuget/v/LogToHtml?style=flat-square" />
-</a>
-<a href="https://www.paypal.com/donate?hosted_button_id=WRETYRRSJ4T2L">
-    <img src="https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square">
-</a>
-
+# LogToHtml
 A small library to write logs to a .html file.
 The HTML file's structure is based on an embedded .cshtml file.
-
-<img src="https://i.imgur.com/pzM1BDj.png" alt="LogToHtml.png">
 
 ## Usage
 Write a log
@@ -112,12 +99,3 @@ List<LogData> warnLogs = Log.GetWarnLogs();
 List<LogData> errorLogs = Log.GetErrorLogs();
 // Get all logs with the critical LogLevel
 ```
-
-## Performance
-Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.
-
-## To Do
-- [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible. 
-- [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
-- [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
-- [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.

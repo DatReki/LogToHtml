@@ -1,0 +1,42 @@
+﻿@{
+	Layout = "Views._Layout";
+}
+
+@section NavItems
+{
+	@foreach (string project in Model.Projects)
+	{
+		<li class="main-nav-items">
+			<button type="button" id="@project-header" class="main-nav-item-link" onclick="showDropdown(this.id, '@project-dropdown')">@project <i class="arrow left"></i></button>
+			<ul id="@project-dropdown" class="dropdown-menu">
+				@foreach (string logLevel in Model.LogLevels)
+				{
+					<li><button type="button" class="dropdown-nav-item" onclick="showErrorTable('@project-@logLevel-textBox')">@logLevel</button></li>
+				}
+			</ul>
+		</li>
+	}
+}
+
+@foreach (string project in Model.Projects)
+{
+	<div id="@project">
+		@foreach (string logLevel in Model.LogLevels)
+		{
+			<div id="@project-@logLevel-textBox" class="message-box @logLevel">
+				<h2 class="loglevel-name">@logLevel</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Log</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+}
