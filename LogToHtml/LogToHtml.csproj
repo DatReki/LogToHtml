@@ -1,37 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Authors>DatReki</Authors>
-    <Company />
-    <Description>A small library to write (error) logs to a .html file.</Description>
-    <PackageTags>HTML log logging</PackageTags>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <Version>1.0.4</Version>
-    <PackageReleaseNotes>Removed some "href" attributes on "dropdown-nav-item" items so that the log file can be embedded within another page without causing issues.</PackageReleaseNotes>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<Authors>DatReki</Authors>
+		<Company />
+		<Description>A small library to write (error) logs to a .html file.</Description>
+		<PackageTags>HTML log logging</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Version>2.0.0</Version>
+		<PackageReleaseNotes>Improved reliability, accessibility (log file) and added a whole bunch of configuration options.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Core\Views\MainPage.cshtml" />
-    <None Remove="Core\Views\_Layout.cshtml" />
-	<None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Core\Views\MainPage.cshtml" />
+		<None Remove="Core\Views\_Layout.cshtml" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Core\Views\MainPage.cshtml" />
-    <EmbeddedResource Include="Core\Views\_Layout.cshtml" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Core\Views\MainPage.cshtml" />
+		<EmbeddedResource Include="Core\Views\_Layout.cshtml" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.17.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="RazorLight" Version="2.3.0" />
-    <PackageReference Include="Spectre.Console" Version="0.45.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AngleSharp" Version="0.17.1" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+		<PackageReference Include="RazorLight" Version="2.3.0" />
+		<PackageReference Include="Spectre.Console" Version="0.45.0" />
+	</ItemGroup>
 
 </Project>
