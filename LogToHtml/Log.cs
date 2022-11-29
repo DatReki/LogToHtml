@@ -110,10 +110,15 @@ namespace LogToHtml
 						logMessage.Append(Markup.Escape($"[{Configuration.TimeZone.GetTime()}] "));
 					if (config.LogLevel)
 					{
-						color = Colors.Get(level);
-						logMessage.Append("[[");
-						logMessage.Append($"[{color}]{level}[/]");
-						logMessage.Append("]] ");
+						if (config.Color)
+						{
+							color = Colors.Get(level);
+							logMessage.Append("[[");
+							logMessage.Append($"[{color}]{level}[/]");
+							logMessage.Append("]] ");
+						}
+						else
+							logMessage.Append($"[{level}] ");
 					}
 					if (config.ProjectName)
 						logMessage.Append(Markup.Escape($"[{options.Project}] "));
@@ -125,7 +130,7 @@ namespace LogToHtml
 						logMessage.Append(Markup.Escape($"[{lineNumber}] "));
 
 					string header = logMessage.ToString().Trim();
-					if (config.LogLevel)
+					if (config.Color && config.LogLevel)
 					{
 						// Write with color
 						try
@@ -149,7 +154,7 @@ namespace LogToHtml
 					else
 					{
 						// Write without color
-						Console.WriteLine($"{header} {message}");
+						Console.WriteLine($"{header.Replace("[[", "[").Replace("]]", "]")} {message}");
 					}
 				}
 				bool fileExists = File.Exists(Configuration.LogFile.Full);

@@ -192,6 +192,8 @@ namespace LogToHtml.Core
 
 			try
 			{
+				// Go through each naming level of SetFileName().
+				// This way we can be almost sure we'll be able to move the file.
 				for (int i = 0; i < 3; i++)
 				{
 					string newPath = Path.Combine(directory, $"{filename}-{SetFileName(i, date)}{extension}");
@@ -204,6 +206,7 @@ namespace LogToHtml.Core
 			}
 			catch (Exception e)
 			{
+				// If the log file ('original') cannot be found just ignore.
 				if (e is FileNotFoundException)
 					return;
 				else
@@ -214,21 +217,21 @@ namespace LogToHtml.Core
 		/// <summary>
 		/// Try and set a new filename for the log file when it's being moved.
 		/// </summary>
-		/// <param name="level">Naming level from 1 to 3.</param>
-		/// <param name="date"></param>
+		/// <param name="level">Naming level from 0 to 2.</param>
+		/// <param name="date">Current date/time.</param>
 		private static string SetFileName(int level, DateTime date)
 		{
 			string shortDate = date.ToShortDateString().Replace('/', '_');
 			string shortTime = date.ToShortTimeString().Replace(':', '_');
-			string shortestTime = date.ToString("ss.fff").Replace(' ', '-').Replace(':', '_');
+			string shortestTime = date.ToString("ss.fff").Replace(':', '_').Replace('.', '_');
 
 			return level switch
 			{
-				// dd/mm/yyyy format
+				// dd_mm_yyyy format
 				0 => $"{shortDate}",
-				// Try create log file with just date + short time
+				//  dd_mm_yyyy-hh_mm format
 				1 => $"{shortDate}-{shortTime}",
-				// If filename with 'date + short time' exists create one with hours:minutes:seconds:miliseconds format
+				// dd_mm_yyyy-hh_mm-ss_fff format
 				_ => $"{shortDate}-{shortTime}-{shortestTime}",
 			};
 		}

@@ -61,6 +61,11 @@ namespace LogToHtml
 		public class ConsoleConfig
 		{
 			/// <summary>
+			/// Configure if you want LogLevel should be displayed in color or not.
+			/// </summary>
+			public bool Color { get; set; } = true;
+
+			/// <summary>
 			/// Configure if the console should display the date.
 			/// </summary>
 			public bool Date { get; set; } = true;

@@ -1,6 +1,6 @@
-﻿# Log2Html
+# Log2Html
 A small library to write logs to a .html file.
-The html file's structure is based of an embedded .cshtml file.
+The HTML file's structure is based on an embedded .cshtml file.
 
 Currently tested working on Linux & Windows.
 
