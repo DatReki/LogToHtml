@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
 		<PreserveCompilationContext>true</PreserveCompilationContext>
 		<Authors>DatReki</Authors>
 		<Company />
@@ -10,10 +10,11 @@
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/DatReki/LogToHtml</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Version>2.0.0</Version>
-		<PackageReleaseNotes>Improved reliability, accessibility (log file) and added a whole bunch of configuration options.</PackageReleaseNotes>
+		<Version>2.0.1</Version>
+		<PackageReleaseNotes>Added .NET 6 support and sealed specific internal classes.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
+		<Title>$(AssemblyName)</Title>
 	</PropertyGroup>
 
 	<ItemGroup>

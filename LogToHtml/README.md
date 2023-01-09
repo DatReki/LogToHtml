@@ -1,9 +1,12 @@
 # LogToHtml
+
 A small library to write logs to a .html file.
 The HTML file's structure is based on an embedded .cshtml file.
 
 ## Usage
+
 Write a log
+
 ```cs
 using LogToHtml;
 using System.Reflection;
@@ -27,7 +30,7 @@ namespace Example
 
         static void Main(string[] args)
         {
-			#region Configure global options 
+			#region Configure global options
 			// These are applied across all projects in a solution.
 
 			// [Required]
@@ -86,6 +89,7 @@ namespace Example
 ```
 
 Retrieve written logs
+
 ```cs
 using LogToHtml.Models;
 

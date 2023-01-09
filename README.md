@@ -16,7 +16,9 @@ The HTML file's structure is based on an embedded .cshtml file.
 <img src="https://i.imgur.com/pzM1BDj.png" alt="LogToHtml.png">
 
 ## Usage
+
 Write a log
+
 ```cs
 using LogToHtml;
 using System.Reflection;
@@ -40,7 +42,7 @@ namespace Example
 
         static void Main(string[] args)
         {
-			#region Configure global options 
+			#region Configure global options
 			// These are applied across all projects in a solution.
 
 			// [Required]
@@ -99,6 +101,7 @@ namespace Example
 ```
 
 Retrieve written logs
+
 ```cs
 using LogToHtml.Models;
 
@@ -114,10 +117,16 @@ List<LogData> errorLogs = Log.GetErrorLogs();
 ```
 
 ## Performance
+
 Currently if you're just writing a log every so often performance is fine but if you write a massive amount to it (300-1000+) it will slow down significantly. I do know ways to make the library faster but currently do not have time to implement these.
 
 ## To Do
-- [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible. 
+
+- [ ] Make sure the library has read access to the file it's logging to if not wait for it to become accessible.
 - [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
 - [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
 - [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.
+
+
+
+
