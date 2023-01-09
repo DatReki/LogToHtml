@@ -22,9 +22,9 @@ namespace Example
             // If you have a solution with multiple projects,
             // you would change this value for each different project.
             Project = $ "{Assembly.GetCallingAssembly().GetName().Name}",
-			
-			// Indicate if you just want to write to the HTML file or also output results on the console.
-			LogToConsole = true
+	    
+	    // Indicate if you just want to write to the HTML file or also output results on the console.
+	    LogToConsole = true
         };
         #endregion
 
@@ -58,9 +58,9 @@ namespace Example
             Configuration.Colors colors = new()
             {
                 Info = "0, 255, 255",
-				Warn = "0,95,95",
-				Error = "#5f0000",
-				Critical = "#d75f00"
+		Warn = "0,95,95",
+		Error = "#5f0000",
+		Critical = "#d75f00"
             };
 
             // [Optional]
@@ -69,12 +69,12 @@ namespace Example
             {
                 // If console displays LogLevel in color
                 Color = true,
-				Date = true,
-				FileName = true,
-				LineNumber = false,
-				LogLevel = true,
-				MethodName = false,
-				ProjectName = true
+		Date = true,
+		FileName = true,
+		LineNumber = false,
+		LogLevel = true,
+		MethodName = false,
+		ProjectName = true
             };
 
             // You only need to set this once in your entire solution.
