@@ -22,7 +22,7 @@ namespace Example
             // If you have a solution with multiple projects,
             // you would change this value for each different project.
             Project = $ "{Assembly.GetCallingAssembly().GetName().Name}",
-
+			
 			// Indicate if you just want to write to the HTML file or also output results on the console.
 			LogToConsole = true
         };

@@ -34,7 +34,7 @@ namespace Example
             // If you have a solution with multiple projects,
             // you would change this value for each different project.
             Project = $ "{Assembly.GetCallingAssembly().GetName().Name}",
-
+			
 			// Indicate if you just want to write to the HTML file or also output results on the console.
 			LogToConsole = true
         };
@@ -126,7 +126,3 @@ Currently if you're just writing a log every so often performance is fine but if
 - [ ] Make the logging process happen in threads this way it won't cause delays for the program that's writing the logs.
 - [x] Store the edited HTML as a string inside the library so that we only need to read logging file once (if it exists).
 - [ ] Create a queue system for the logs to reduce the amount of IO calls the library needs to make.
-
-
-
-
